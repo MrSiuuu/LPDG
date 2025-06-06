@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { supabase } from '@/config/api'
+import { supabase } from '../supabase'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,42 +20,68 @@ const router = createRouter({
       component: () => import('@/components/auth/RegisterForm.vue')
     },
     {
-      path: '/profile',
-      name: 'profile',
-      component: () => import('@/views/ProfileView.vue'),
-      meta: { requiresAuth: true }
+      path: '/dashboard-user',
+      name: 'dashboard-user',
+      component: () => import('@/views/DashboardUser.vue'),
+      meta: { requiresAuth: true, role: 'user' }
     },
     {
-      path: '/dashboard-candidat',
-      name: 'dashboard-candidat',
-      component: () => import('@/views/DashboardCandidat.vue'),
-      meta: { requiresAuth: true }
+      path: '/dashboard-contributeur',
+      name: 'dashboard-contributeur',
+      component: () => import('@/views/DashboardContributeur.vue'),
+      meta: { requiresAuth: true, role: 'contributor' }
     },
     {
-      path: '/dashboard-entreprise',
-      name: 'dashboard-entreprise',
-      component: () => import('@/views/DashboardEntreprise.vue'),
-      meta: { requiresAuth: true }
+      path: '/dashboard-blogueur',
+      name: 'dashboard-blogueur',
+      component: () => import('@/views/DashboardBlogueur.vue'),
+      meta: { requiresAuth: true, role: 'blogger' }
     },
     {
-      path: '/register-candidat',
-      name: 'register-candidat',
-      component: () => import('@/components/auth/RegisterCandidat.vue')
+      path: '/adminlpdg',
+      name: 'adminlpdg',
+      component: () => import('@/views/AdminView.vue'),
+      meta: { requiresAuth: true, role: 'admin' }
     },
     {
-      path: '/register-entreprise',
-      name: 'register-entreprise',
-      component: () => import('@/components/auth/RegisterEntreprise.vue')
+      path: '/ajouter-lieu',
+      name: 'ajouter-lieu',
+      component: () => import('@/views/AddLieuView.vue'),
+      meta: { requiresAuth: true, role: ['admin', 'contributor'] }
+    },
+    {
+      path: '/lieu/:id',
+      name: 'lieu-detail',
+      component: () => import('@/views/LieuDetail.vue')
+    },
+    {
+      path: '/articles/:id',
+      name: 'article-detail',
+      component: () => import('@/views/ArticleDetail.vue')
+    },
+    {
+      path: '/article/nouveau',
+      name: 'article-create',
+      component: () => import('@/views/ArticleCreate.vue'),
+      meta: { requiresAuth: true, role: 'blogger' }
     }
   ]
 })
 
 // Navigation guard
 router.beforeEach(async (to, from, next) => {
-  const { data: { user } } = await supabase.auth.getUser()
+  const role = localStorage.getItem('user_role')
+  const isAuthenticated = !!role
   
-  if (to.meta.requiresAuth && !user) {
+  if (to.meta.requiresAuth && !isAuthenticated) {
     next('/login')
+  } else if (to.meta.role) {
+    const requiredRoles = Array.isArray(to.meta.role) ? to.meta.role : [to.meta.role]
+    if (!requiredRoles.includes(role)) {
+      next('/login')
+    } else {
+      next()
+    }
   } else {
     next()
   }

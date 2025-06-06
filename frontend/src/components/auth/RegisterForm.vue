@@ -9,6 +9,18 @@
       <form class="mt-8 space-y-6" @submit.prevent="handleRegister">
         <div class="rounded-md shadow-sm -space-y-px">
           <div>
+            <label for="nom" class="sr-only">Nom complet</label>
+            <input
+              id="nom"
+              v-model="nom"
+              name="nom"
+              type="text"
+              required
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              placeholder="Nom complet"
+            />
+          </div>
+          <div>
             <label for="email" class="sr-only">Email</label>
             <input
               id="email"
@@ -16,7 +28,7 @@
               name="email"
               type="email"
               required
-              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               placeholder="Email"
             />
           </div>
@@ -45,38 +57,39 @@
       <div v-if="confirmationMessage" class="mt-4 text-green-600 text-center">
         {{ confirmationMessage }}
       </div>
+      <div v-if="errorMessage" class="mt-4 text-red-600 text-center">
+        {{ errorMessage }}
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { supabase } from '@/config/api'
+import axios from 'axios'
 
+const nom = ref('')
 const email = ref('')
 const password = ref('')
 const confirmationMessage = ref('')
+const errorMessage = ref('')
 
 const handleRegister = async () => {
   confirmationMessage.value = ''
+  errorMessage.value = ''
   try {
-    const { error } = await supabase.auth.signUp({
+    const { data } = await axios.post('/api/auth/signup', {
+      nom: nom.value,
       email: email.value,
       password: password.value,
+      role: 'user'
     })
-    if (error) {
-      if (error.message && error.message.toLowerCase().includes('user already registered')) {
-        confirmationMessage.value = "Tu as déjà un compte, connecte-toi."
-      } else {
-        confirmationMessage.value = "Erreur : " + error.message
-      }
-      return
-    }
-    confirmationMessage.value = "Merci ! Vérifie ta boîte mail pour confirmer ton compte."
+    confirmationMessage.value = data.message || 'Compte créé avec succès. Vérifie ta boîte mail.'
+    nom.value = ''
     email.value = ''
     password.value = ''
   } catch (error) {
-    confirmationMessage.value = "Erreur : " + error.message
+    errorMessage.value = error.response?.data?.error || 'Erreur lors de la création du compte.'
   }
 }
 </script> 
