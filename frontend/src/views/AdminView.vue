@@ -25,32 +25,8 @@
     <!-- Main content -->
     <main class="flex-1 p-10 bg-gray-50 min-h-screen">
       <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- En-tête avec photo de profil et bouton d'édition -->
-        <div class="bg-white shadow rounded-lg mb-6">
-          <div class="px-4 py-5 sm:px-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <img
-                  :src="profile.photo || 'https://via.placeholder.com/150'"
-                  alt="Avatar"
-                  class="h-16 w-16 rounded-full"
-                />
-                <div class="ml-4">
-                  <h3 class="text-lg leading-6 font-medium text-gray-900">
-                    {{ profile.nom }}
-                  </h3>
-                  <p class="text-sm text-gray-500">{{ profile.email }}</p>
-                </div>
-              </div>
-              <button
-                @click="showEditModal = true"
-                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-              >
-                Modifier le profil
-              </button>
-            </div>
-          </div>
-        </div>
+        <!-- En-tête utilisateur simplifié -->
+        <h2 class="text-2xl font-bold text-gray-800 mb-8">Bienvenue sur le dashboard, {{ profile.nom }}</h2>
 
         <div v-if="activeTab === 'dashboard'">
           <h1 class="text-3xl font-bold mb-6 text-gray-800">Bienvenue sur le dashboard administrateur</h1>
@@ -179,16 +155,11 @@
             />
           </div>
         </div>
+        <div v-else-if="activeTab === 'profil'">
+          <ProfileEdit :profile="profile" @update="handleProfileUpdate" />
+        </div>
       </div>
     </main>
-
-    <!-- Modal d'édition -->
-    <EditProfileModal
-      :is-open="showEditModal"
-      :profile="profile"
-      @close="showEditModal = false"
-      @update="handleProfileUpdate"
-    />
   </div>
 </template>
 
@@ -196,13 +167,12 @@
 import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { supabase } from '../supabase'
-import EditProfileModal from '../components/modals/EditProfileModal.vue'
 import LieuModal from '@/components/LieuModal.vue'
 import axios from 'axios'
+import ProfileEdit from './ProfileEdit.vue'
 
 const router = useRouter()
 const profile = ref({})
-const showEditModal = ref(false)
 const showLieuModal = ref(false)
 const editingLieu = ref(null)
 
@@ -210,7 +180,8 @@ const editingLieu = ref(null)
 const navItems = [
   { label: 'Accueil', tab: 'dashboard' },
   { label: 'Utilisateurs', tab: 'utilisateurs' },
-  { label: 'Lieux', tab: 'lieux' }
+  { label: 'Lieux', tab: 'lieux' },
+  { label: 'Profil', tab: 'profil' }
 ]
 
 const activeTab = ref('dashboard')
@@ -235,8 +206,17 @@ const fetchProfile = async () => {
   }
 }
 
-const handleProfileUpdate = (updatedProfile) => {
-  profile.value = { ...profile.value, ...updatedProfile }
+const handleProfileUpdate = async (updatedProfile) => {
+  try {
+    const { error } = await supabase
+      .from('user_profiles')
+      .update(updatedProfile)
+      .eq('id', profile.value.id)
+    if (error) throw error
+    profile.value = { ...profile.value, ...updatedProfile }
+  } catch (error) {
+    alert('Erreur lors de la mise à jour du profil : ' + error.message)
+  }
 }
 
 function setTab(tab) {

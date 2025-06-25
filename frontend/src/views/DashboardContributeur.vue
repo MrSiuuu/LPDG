@@ -32,7 +32,7 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center">
               <img
-                :src="profile.photo || 'https://via.placeholder.com/150'"
+                :src="profile.photo || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiNEMTQ3RjAiLz4KPHN2ZyB4PSIxNiIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMiAxMmMyLjIxIDAgNC0xLjc5IDQtNHMtMS43OS00LTQtNC00IDEuNzktNCA0IDEuNzkgNCA0IDR6bTAgMmMtMi42NyAwLTggMS4zNC04IDR2MmgxNnYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz4KPC9zdmc+Cjwvc3ZnPgo='"
                 alt="Avatar"
                 class="h-16 w-16 rounded-full"
               />
@@ -43,12 +43,6 @@
                 <p class="text-sm text-gray-500">{{ profile.email }}</p>
               </div>
             </div>
-            <button
-              @click="showEditModal = true"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              Modifier le profil
-            </button>
           </div>
         </div>
       </div>
@@ -74,7 +68,7 @@
         <div class="mt-10">
           <h2 class="text-xl font-semibold text-gray-700 mb-4">Actions rapides</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button @click="showAjouterLieu = true" class="border-2 border-indigo-300 rounded-lg p-6 text-center hover:bg-indigo-50">
+            <button @click="setTab('ajouter')" class="border-2 border-indigo-300 rounded-lg p-6 text-center hover:bg-indigo-50">
               <div class="text-lg font-medium text-indigo-700">+ Ajouter un lieu</div>
             </button>
             <button @click="setTab('lieux')" class="border-2 border-indigo-300 rounded-lg p-6 text-center hover:bg-indigo-50">
@@ -122,28 +116,17 @@
         <button @click="setTab('dashboard')" class="mt-6 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Retour au tableau de bord</button>
       </div>
 
-      <div v-else-if="activeTab === 'profil'">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Mon profil</h2>
-        <p class="text-gray-500">Fonctionnalité à compléter : affichage du profil utilisateur.</p>
-        <button @click="setTab('dashboard')" class="mt-6 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Retour au tableau de bord</button>
+      <div v-else-if="activeTab === 'ajouter'">
+        <LieuForm 
+          :editing-lieu="editingLieu" 
+          @submit="submitLieu" 
+          @cancel="cancelForm" 
+        />
       </div>
 
-      <!-- Modal Ajouter / Modifier -->
-      <LieuModal
-        :show="showAjouterLieu"
-        :editing-lieu="editingLieu"
-        :show-statut="false"
-        @close="closeModal"
-        @submit="submitLieu"
-      />
-
-      <!-- Modal d'édition -->
-      <EditProfileModal
-        :is-open="showEditModal"
-        :profile="profile"
-        @close="showEditModal = false"
-        @update="handleProfileUpdate"
-      />
+      <div v-else-if="activeTab === 'profil'">
+        <ProfileEdit :profile="profile" @update="handleProfileUpdate" />
+      </div>
     </main>
   </div>
 </template>
@@ -153,22 +136,20 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabase'
 import axios from 'axios'
-import LieuModal from '../components/LieuModal.vue'
-import EditProfileModal from '../components/modals/EditProfileModal.vue'
+import LieuForm from '../components/LieuForm.vue'
+import ProfileEdit from './ProfileEdit.vue'
 
 const router = useRouter()
 const loading = ref(true)
-const showAjouterLieu = ref(false)
-const showMesLieux = ref(false)
 const editingLieu = ref(null)
 const activeTab = ref('dashboard')
-const showEditModal = ref(false)
 const profile = ref({})
 
 // Navigation items
 const navItems = [
   { tab: 'dashboard', label: 'Tableau de bord' },
   { tab: 'lieux', label: 'Mes lieux' },
+  { tab: 'ajouter', label: 'Ajouter un lieu' },
   { tab: 'profil', label: 'Mon profil' }
 ]
 
@@ -180,17 +161,13 @@ const lieuxValides = ref(0)
 // Liste des lieux
 const lieuxRecents = ref([])
 
-// Formulaire
-const lieuForm = ref({
-  nom: '',
-  description: '',
-  adresse: '',
-  categorie: ''
-})
-
 // Changer d'onglet
 const setTab = (tab) => {
   activeTab.value = tab
+  // Réinitialiser le lieu en édition si on change d'onglet
+  if (tab !== 'ajouter') {
+    editingLieu.value = null
+  }
 }
 
 // Déconnexion
@@ -218,9 +195,9 @@ const loadData = async () => {
     ])
 
     lieuxRecents.value = lieuxResponse.data
-    totalLieux.value = statsResponse.data.total
-    lieuxEnAttente.value = statsResponse.data.en_attente
-    lieuxValides.value = statsResponse.data.valides
+    totalLieux.value = statsResponse.data.totalLieux
+    lieuxEnAttente.value = statsResponse.data.lieuxEnAttente
+    lieuxValides.value = statsResponse.data.lieuxValides
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)
   }
@@ -256,7 +233,9 @@ const submitLieu = async (formData) => {
       await axios.post('/api/lieux', formData, { headers })
     }
 
-    closeModal()
+    // Réinitialiser et retourner au tableau de bord
+    editingLieu.value = null
+    setTab('dashboard')
     loadData()
   } catch (error) {
     console.error('Erreur lors de la soumission du lieu:', error)
@@ -266,8 +245,7 @@ const submitLieu = async (formData) => {
 // Éditer un lieu
 const editLieu = (lieu) => {
   editingLieu.value = lieu
-  lieuForm.value = { ...lieu }
-  showAjouterLieu.value = true
+  setTab('ajouter')
 }
 
 // Supprimer un lieu
@@ -286,20 +264,23 @@ const deleteLieu = async (lieu) => {
   }
 }
 
-// Fermer le modal
-const closeModal = () => {
-  showAjouterLieu.value = false
+// Annuler le formulaire
+const cancelForm = () => {
   editingLieu.value = null
-  lieuForm.value = {
-    nom: '',
-    description: '',
-    adresse: '',
-    categorie: ''
-  }
+  setTab('dashboard')
 }
 
-const handleProfileUpdate = (updatedProfile) => {
-  profile.value = { ...profile.value, ...updatedProfile }
+const handleProfileUpdate = async (updatedProfile) => {
+  try {
+    const { error } = await supabase
+      .from('user_profiles')
+      .update(updatedProfile)
+      .eq('id', profile.value.id)
+    if (error) throw error
+    profile.value = { ...profile.value, ...updatedProfile }
+  } catch (error) {
+    alert('Erreur lors de la mise à jour du profil : ' + error.message)
+  }
 }
 
 onMounted(() => {

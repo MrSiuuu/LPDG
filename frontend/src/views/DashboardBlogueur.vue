@@ -36,12 +36,6 @@
               </h3>
               <p class="text-sm text-gray-500">{{ profile.email }}</p>
             </div>
-            <button
-              @click="showEditModal = true"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
-            >
-              Modifier le profil
-            </button>
           </div>
         </div>
       </div>
@@ -87,18 +81,8 @@
       </div>
 
       <div v-else-if="activeTab === 'profil'">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Mon profil</h2>
-        <p class="text-gray-500">Fonctionnalité à compléter : affichage du profil utilisateur.</p>
-        <button @click="setTab('dashboard')" class="mt-6 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">Retour au tableau de bord</button>
+        <ProfileEdit :profile="profile" @update="handleProfileUpdate" />
       </div>
-
-      <!-- Modal d'édition -->
-      <EditProfileModal
-        :is-open="showEditModal"
-        :profile="profile"
-        @close="showEditModal = false"
-        @update="handleProfileUpdate"
-      />
     </main>
   </div>
 </template>
@@ -107,12 +91,11 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabase'
-import EditProfileModal from '../components/modals/EditProfileModal.vue'
 import ArticleList from '../components/ArticleList.vue'
+import ProfileEdit from './ProfileEdit.vue'
 
 const router = useRouter()
 const profile = ref({})
-const showEditModal = ref(false)
 const refreshKey = ref(0)
 const userId = localStorage.getItem('user_id')
 const activeTab = ref('dashboard')
@@ -152,8 +135,17 @@ const fetchProfile = async () => {
   }
 }
 
-const handleProfileUpdate = (updatedProfile) => {
-  profile.value = { ...profile.value, ...updatedProfile }
+const handleProfileUpdate = async (updatedProfile) => {
+  try {
+    const { error } = await supabase
+      .from('user_profiles')
+      .update(updatedProfile)
+      .eq('id', profile.value.id)
+    if (error) throw error
+    profile.value = { ...profile.value, ...updatedProfile }
+  } catch (error) {
+    alert('Erreur lors de la mise à jour du profil : ' + error.message)
+  }
 }
 
 function setTab(tab) {

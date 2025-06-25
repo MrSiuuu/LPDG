@@ -6,6 +6,11 @@
         <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Logo LPDG">
         <span class="self-center text-2xl font-semibold whitespace-nowrap text-gray-900">LPDG - Annuaire Touristique</span>
       </router-link>
+      <!-- Barre de recherche -->
+      <form @submit.prevent="onSearch" class="hidden md:flex items-center mx-4 w-96 max-w-xs">
+        <input v-model="searchQuery" type="text" placeholder="Rechercher un lieu, une ville..." class="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-r-md hover:bg-indigo-600">Rechercher</button>
+      </form>
       <!-- Liens à droite -->
       <div class="flex items-center space-x-4">
         <template v-if="isAuthenticated">
@@ -37,12 +42,20 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, watchEffect } from 'vue'
+import { ref, onMounted } from 'vue'
 import { supabase } from '../supabase'
 
 const router = useRouter()
 const role = ref(localStorage.getItem('user_role'))
 const isAuthenticated = ref(!!role.value)
+
+const searchQuery = ref('')
+
+const emit = defineEmits(['search'])
+
+const onSearch = () => {
+  emit('search', searchQuery.value)
+}
 
 const handleLogout = () => {
   localStorage.removeItem('user_role')
@@ -51,9 +64,30 @@ const handleLogout = () => {
   router.push('/login')
 }
 
-// Met à jour automatiquement le rôle si le localStorage change (connexion/déconnexion)
-watchEffect(() => {
-  role.value = localStorage.getItem('user_role')
-  isAuthenticated.value = !!role.value
+// Écouter les changements d'authentification Supabase
+onMounted(() => {
+  supabase.auth.onAuthStateChange((event, session) => {
+    console.log('Auth state changed:', event)
+    
+    if (event === 'SIGNED_IN') {
+      // L'utilisateur vient de se connecter
+      // On vérifie périodiquement que le rôle est disponible
+      const checkRole = () => {
+        const userRole = localStorage.getItem('user_role')
+        if (userRole) {
+          role.value = userRole
+          isAuthenticated.value = true
+        } else {
+          // Si le rôle n'est pas encore là, on réessaie dans 50ms
+          setTimeout(checkRole, 50)
+        }
+      }
+      checkRole()
+    } else if (event === 'SIGNED_OUT') {
+      // L'utilisateur vient de se déconnecter
+      role.value = null
+      isAuthenticated.value = false
+    }
+  })
 })
 </script> 

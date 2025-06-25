@@ -3,7 +3,9 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import LieuxAccueil from '../components/LieuxAccueil.vue'
 import ArticleCard from '../components/ArticleCard.vue'
+import HeroVideoPoints from '../components/HeroVideoPoints.vue'
 import axios from 'axios'
+import Navbar from '../components/Navbar.vue'
 
 const router = useRouter()
 const role = localStorage.getItem('user_role')
@@ -11,6 +13,7 @@ const isAuthenticated = !!role
 
 const articles = ref([])
 const loading = ref(true)
+const search = ref('')
 
 const handleLogout = () => {
   localStorage.removeItem('user_role')
@@ -28,48 +31,17 @@ async function fetchArticles() {
   loading.value = false
 }
 
+function onSearch(q) {
+  search.value = q
+}
+
 onMounted(fetchArticles)
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100">
     <!-- Navigation -->
-    <nav class="bg-white shadow">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex">
-            <div class="flex-shrink-0 flex items-center">
-              <h1 class="text-xl font-bold text-indigo-600">LPDG - Annuaire Touristique</h1>
-            </div>
-          </div>
-          <div class="flex items-center">
-            <template v-if="isAuthenticated">
-              <span class="text-gray-700 px-3 py-2 rounded-md text-sm font-medium">Connecté en tant que <b>{{ role }}</b></span>
-              <button
-                @click="handleLogout"
-                class="ml-4 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Déconnexion
-              </button>
-            </template>
-            <template v-else>
-              <router-link
-                to="/login"
-                class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Connexion
-              </router-link>
-              <router-link
-                to="/register"
-                class="ml-4 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-              >
-                Inscription
-              </router-link>
-            </template>
-          </div>
-        </div>
-      </div>
-    </nav>
+    <Navbar @search="onSearch" />
 
     <!-- Hero Section -->
     <div class="bg-white">
@@ -119,6 +91,9 @@ onMounted(fetchArticles)
       </div>
     </div>
 
+    <!-- Section vidéo + points clés -->
+    <HeroVideoPoints />
+
     <main>
       <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div class="max-w-7xl mx-auto py-10 px-4">
@@ -129,7 +104,7 @@ onMounted(fetchArticles)
             <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
           </div>
         </div>
-        <LieuxAccueil />
+        <LieuxAccueil :search="search" />
       </div>
     </main>
   </div>

@@ -44,12 +44,6 @@
         <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
           <div class="flex justify-end space-x-3">
             <button
-              @click="showEditModal = true"
-              class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
-            >
-              Modifier le profil
-            </button>
-            <button
               @click="handleLogout"
               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
@@ -59,14 +53,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Modal d'édition -->
-    <EditProfileModal
-      :is-open="showEditModal"
-      :profile="profile"
-      @close="showEditModal = false"
-      @update="handleProfileUpdate"
-    />
   </div>
 </template>
 
@@ -74,11 +60,9 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabase'
-import EditProfileModal from '../components/modals/EditProfileModal.vue'
 
 const router = useRouter()
 const profile = ref({})
-const showEditModal = ref(false)
 
 const fetchProfile = async () => {
   try {
@@ -97,10 +81,6 @@ const fetchProfile = async () => {
     console.error('Erreur lors du chargement du profil:', error.message)
     router.push('/login')
   }
-}
-
-const handleProfileUpdate = (updatedProfile) => {
-  profile.value = { ...profile.value, ...updatedProfile }
 }
 
 const handleLogout = async () => {
