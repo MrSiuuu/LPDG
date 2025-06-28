@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto py-10 px-4 bg-white min-h-screen">
+  <div class="pt-20 max-w-5xl mx-auto py-10 px-4 bg-white min-h-screen">
     <button @click="$router.back()" class="mb-6 text-indigo-600 hover:underline flex items-center">
       <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
@@ -35,9 +35,9 @@
         </div>
         
         <div class="flex items-center gap-2">
-          <LieuLikes :lieuId="lieu.id" />
+          <LieuLikes :lieuId="lieuId" />
           <button
-            v-if="lieu.id"
+            v-if="lieuId"
             @click="toggleVisite"
             :class="[
               'btn btn-xs',
@@ -50,7 +50,7 @@
           </button>
           <!-- Bouton Signaler -->
           <button
-            v-if="lieu.id && user"
+            v-if="lieuId && user"
             @click="showSignalementModal = true"
             class="btn btn-xs bg-red-100 text-red-700 border-red-300 rounded-full px-3 py-1 border transition-all duration-200 hover:bg-red-200"
           >
@@ -83,16 +83,16 @@
     </div>
 
     <!-- Vidéos de présentation -->
-    <LieuVideo :lieuId="lieu.id" />
+    <LieuVideo v-if="lieuId" :lieuId="lieuId" />
 
     <!-- Événements à venir -->
-    <LieuEvenements :lieuId="lieu.id" />
+    <LieuEvenements v-if="lieuId" :lieuId="lieuId" />
 
     <!-- Liens & Ressources -->
     <LieuRessources :lieu="lieu" />
 
     <!-- Contact rapide -->
-    <LieuContacts :lieuId="lieu.id" />
+    <LieuContacts v-if="lieuId" :lieuId="lieuId" />
 
     <!-- Partage sur les réseaux sociaux -->
     <LieuPartage :lieu="lieu" />
@@ -128,7 +128,7 @@
     <!-- Modal de signalement -->
     <SignalementModal 
       :show="showSignalementModal" 
-      :lieuId="lieu.id"
+      :lieuId="lieuId"
       @close="showSignalementModal = false"
       @signalement-created="onSignalementCreated"
     />
@@ -157,6 +157,12 @@ const newAvis = ref({ note: '', commentaire: '' })
 const showSignalementModal = ref(false)
 const user = ref(null)
 
+// Récupérer l'ID du lieu depuis la route et le convertir en nombre
+const lieuId = computed(() => {
+  const id = Number(route.params.id)
+  return isNaN(id) ? null : id
+})
+
 // Calcul de la note moyenne et nombre d'avis
 const noteMoyenne = computed(() => {
   if (avis.value.length === 0) return 0
@@ -176,12 +182,12 @@ async function fetchUser() {
 }
 
 async function fetchHasVisited() {
-  if (!lieu.value.id) return
+  if (!lieuId.value) return
   try {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const { data } = await axios.get(`/api/lieux/${lieu.value.id}/has-visited`, { headers })
+    const { data } = await axios.get(`/api/lieux/${lieuId.value}/has-visited`, { headers })
     hasVisited.value = data?.hasVisited || false
   } catch (e) {
     hasVisited.value = false
@@ -189,16 +195,16 @@ async function fetchHasVisited() {
 }
 
 async function toggleVisite() {
-  if (!lieu.value.id) return
+  if (!lieuId.value) return
   try {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
     if (!hasVisited.value) {
-      await axios.post(`/api/lieux/${lieu.value.id}/visite`, {}, { headers })
+      await axios.post(`/api/lieux/${lieuId.value}/visite`, {}, { headers })
       hasVisited.value = true
     } else {
-      await axios.delete(`/api/lieux/${lieu.value.id}/visite`, { headers })
+      await axios.delete(`/api/lieux/${lieuId.value}/visite`, { headers })
       hasVisited.value = false
     }
   } catch (e) {
@@ -217,7 +223,7 @@ async function fetchAvis() {
     const { data } = await supabase
       .from('avis')
       .select('*, user_profiles(nom)')
-      .eq('lieu_id', route.params.id)
+      .eq('lieu_id', lieuId.value)
       .order('created_at', { ascending: false })
     avis.value = (data || []).map(a => ({ ...a, user_nom: a.user_profiles?.nom }))
   } finally {
@@ -226,12 +232,12 @@ async function fetchAvis() {
 }
 
 async function submitAvis() {
-  if (!newAvis.value.note || !newAvis.value.commentaire) return
+  if (!newAvis.value.note || !newAvis.value.commentaire || !lieuId.value) return
   try {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    await axios.post(`/api/lieux/${lieu.value.id}/avis`, newAvis.value, { headers })
+    await axios.post(`/api/lieux/${lieuId.value}/avis`, newAvis.value, { headers })
     newAvis.value.note = ''
     newAvis.value.commentaire = ''
     await fetchAvis()
@@ -246,10 +252,15 @@ function onSignalementCreated() {
 onMounted(async () => {
   await fetchUser()
   
+  if (!lieuId.value) {
+    console.error('ID de lieu invalide:', route.params.id)
+    return
+  }
+  
   const { data } = await supabase
     .from('lieux')
     .select('*')
-    .eq('id', route.params.id)
+    .eq('id', lieuId.value)
     .single()
 
   if (data && typeof data.images === 'string') {

@@ -13,7 +13,6 @@ const isAuthenticated = !!role
 
 const articles = ref([])
 const loading = ref(true)
-const search = ref('')
 
 const handleLogout = () => {
   localStorage.removeItem('user_role')
@@ -31,20 +30,16 @@ async function fetchArticles() {
   loading.value = false
 }
 
-function onSearch(q) {
-  search.value = q
-}
-
 onMounted(fetchArticles)
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-100">
     <!-- Navigation -->
-    <Navbar @search="onSearch" />
+    <Navbar />
 
     <!-- Hero Section -->
-    <div class="bg-white">
+    <div class="bg-white mt-10">
       <div class="max-w-4xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
         <div class="text-center">
           <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
@@ -104,7 +99,7 @@ onMounted(fetchArticles)
             <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
           </div>
         </div>
-        <LieuxAccueil :search="search" />
+        <LieuxAccueil />
       </div>
     </main>
   </div>

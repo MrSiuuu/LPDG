@@ -83,6 +83,11 @@ function formatPhone(phone) {
 }
 
 async function fetchContacts() {
+  if (!props.lieuId || isNaN(props.lieuId)) {
+    console.warn('LieuContacts: lieuId invalide:', props.lieuId)
+    return
+  }
+  
   loading.value = true
   try {
     const { data } = await supabase

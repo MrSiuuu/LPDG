@@ -82,6 +82,11 @@ function formatDuration(seconds) {
 }
 
 async function fetchVideos() {
+  if (!props.lieuId || isNaN(props.lieuId)) {
+    console.warn('LieuVideo: lieuId invalide:', props.lieuId)
+    return
+  }
+  
   loading.value = true
   try {
     const { data } = await supabase

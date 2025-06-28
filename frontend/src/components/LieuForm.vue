@@ -220,7 +220,12 @@
       <!-- Section Événements -->
       <div class="border-b border-gray-200 pb-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Événements à venir</h3>
-        <div class="space-y-4">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Ce lieu a-t-il des événements à venir ?</label>
+          <button type="button" v-if="!showEvenementForm" @click="showEvenementForm = true" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded mr-2">Oui</button>
+          <button type="button" v-if="showEvenementForm" @click="showEvenementForm = false" class="px-3 py-1 bg-gray-100 text-gray-700 rounded">Non</button>
+        </div>
+        <div v-if="showEvenementForm" class="space-y-4">
           <div v-for="(evenement, index) in form.evenements" :key="index" class="bg-gray-50 p-4 rounded-lg">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -273,7 +278,12 @@
       <!-- Section Contacts -->
       <div class="border-b border-gray-200 pb-6">
         <h3 class="text-lg font-semibold text-gray-800 mb-4">Contacts</h3>
-        <div class="space-y-4">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Ce lieu a-t-il un contact sur place ?</label>
+          <button type="button" v-if="!showContactForm" @click="showContactForm = true" class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded mr-2">Oui</button>
+          <button type="button" v-if="showContactForm" @click="showContactForm = false" class="px-3 py-1 bg-gray-100 text-gray-700 rounded">Non</button>
+        </div>
+        <div v-if="showContactForm" class="space-y-4">
           <div v-for="(contact, index) in form.contacts" :key="index" class="bg-gray-50 p-4 rounded-lg">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -430,6 +440,8 @@ const galleryPreviews = ref([])
 const mainImageFile = ref(null)
 const galleryFiles = ref([])
 const ressourceFiles = ref([])
+const showContactForm = ref(false)
+const showEvenementForm = ref(false)
 
 // Définir resetForm avant le watcher
 const resetForm = () => {
@@ -486,8 +498,12 @@ watch(() => props.editingLieu, (newValue) => {
     }
     mainImagePreview.value = newValue.image_principale
     galleryPreviews.value = newValue.images || []
+    showContactForm.value = (newValue.contacts && newValue.contacts.length > 0)
+    showEvenementForm.value = (newValue.evenements && newValue.evenements.length > 0)
   } else {
     resetForm()
+    showContactForm.value = false
+    showEvenementForm.value = false
   }
 }, { immediate: true })
 

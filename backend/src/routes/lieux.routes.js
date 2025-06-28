@@ -3,6 +3,9 @@ const router = express.Router();
 const lieuxController = require('../controllers/lieux.controller');
 const { requireAuth } = require('../middlewares/auth.middleware');
 
+// Recherche de lieux (doit être avant les routes avec paramètres)
+router.get('/search', lieuxController.searchLieux);
+
 // Routes protégées par authentification
 router.post('/', requireAuth, lieuxController.addLieu);
 router.put('/:id', requireAuth, lieuxController.updateLieu);
@@ -26,8 +29,5 @@ router.get('/user/visited', requireAuth, lieuxController.getVisitedLieux);
 
 // Route pour ajouter un avis
 router.post('/:id/avis', requireAuth, lieuxController.addAvis);
-
-// Recherche de lieux
-router.get('/search', lieuxController.searchLieux);
 
 module.exports = router; 

@@ -64,6 +64,16 @@ const router = createRouter({
       name: 'article-create',
       component: () => import('@/views/ArticleCreate.vue'),
       meta: { requiresAuth: true, role: 'blogger' }
+    },
+    {
+      path: '/carte-guinee',
+      name: 'carte-guinee',
+      component: () => import('@/views/CarteGuineeView.vue')
+    },
+    {
+      path: '/search',
+      name: 'search-results',
+      component: () => import('@/views/SearchResults.vue')
     }
   ]
 })

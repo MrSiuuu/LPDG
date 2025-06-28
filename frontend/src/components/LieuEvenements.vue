@@ -1,5 +1,5 @@
 <template>
-  <div v-if="evenements.length > 0" class="bg-white rounded-lg shadow p-6 mt-8">
+  <div class="bg-white rounded-lg shadow p-6 mt-8">
     <h2 class="text-xl font-bold mb-4 text-indigo-700 flex items-center">
       <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -7,7 +7,9 @@
       Événements à venir
     </h2>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div v-if="loading" class="text-gray-500">Chargement des événements...</div>
+    <div v-else-if="evenements.length === 0" class="text-gray-400">Aucun événement à venir pour ce lieu.</div>
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div v-for="evenement in evenements" :key="evenement.id" class="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-500">
         <div v-if="evenement.photo_evenement" class="mb-3">
           <img :src="evenement.photo_evenement" :alt="evenement.titre" class="w-full h-32 object-cover rounded-lg" />
@@ -82,15 +84,45 @@ function formatDate(dateStr) {
 }
 
 async function fetchEvenements() {
+  if (!props.lieuId || isNaN(props.lieuId)) {
+    console.warn('LieuEvenements: lieuId invalide:', props.lieuId)
+    return
+  }
+  
   loading.value = true
   try {
-    const { data } = await supabase
+    console.log('Fetching events for lieu ID:', props.lieuId)
+    
+    // D'abord, récupérons tous les événements pour ce lieu
+    const { data: allEvents, error: allError } = await supabase
+      .from('evenements_lieu')
+      .select('*')
+      .eq('lieu_id', props.lieuId)
+    
+    console.log('All events for this lieu:', allEvents)
+    console.log('Error if any:', allError)
+    
+    if (allError) {
+      console.error('Erreur lors du chargement de tous les événements:', allError)
+      return
+    }
+    
+    // Maintenant, filtrons les événements futurs et actifs
+    const { data, error } = await supabase
       .from('evenements_lieu')
       .select('*')
       .eq('lieu_id', props.lieuId)
       .gte('date_debut', new Date().toISOString())
       .eq('est_actif', true)
       .order('date_debut', { ascending: true })
+    
+    console.log('Filtered events (future and active):', data)
+    console.log('Error if any:', error)
+    
+    if (error) {
+      console.error('Erreur lors du chargement des événements:', error)
+      return
+    }
     
     evenements.value = data || []
   } catch (error) {

@@ -31,11 +31,9 @@
         <div class="px-4 py-5 sm:px-6">
           <div class="flex items-center justify-between">
             <div class="flex items-center">
-              <img
-                :src="profile.photo || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9IiNEMTQ3RjAiLz4KPHN2ZyB4PSIxNiIgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIzMiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMiAxMmMyLjIxIDAgNC0xLjc5IDQtNHMtMS43OS00LTQtNC00IDEuNzktNCA0IDEuNzkgNCA0IDR6bTAgMmMtMi42NyAwLTggMS4zNC04IDR2MmgxNnYtMmMwLTIuNjYtNS4zMy00LTgtNHoiLz4KPC9zdmc+Cjwvc3ZnPgo='"
-                alt="Avatar"
-                class="h-16 w-16 rounded-full"
-              />
+              <div class="h-16 w-16 rounded-full bg-indigo-200 flex items-center justify-center text-2xl font-bold text-indigo-800 uppercase">
+                {{ getInitiales(profile.nom) }}
+              </div>
               <div class="ml-4">
                 <h3 class="text-lg leading-6 font-medium text-gray-900">
                   {{ profile.nom }}
@@ -305,6 +303,13 @@ const fetchProfile = async () => {
     console.error('Erreur lors du chargement du profil:', error.message)
     router.push('/login')
   }
+}
+
+function getInitiales(nom) {
+  if (!nom) return ''
+  const parts = nom.trim().split(' ')
+  if (parts.length === 1) return parts[0].slice(0, 2)
+  return (parts[0][0] + parts[1][0]).toUpperCase()
 }
 </script>
 

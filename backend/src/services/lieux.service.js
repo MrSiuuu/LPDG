@@ -213,18 +213,79 @@ async function getLieuById(id) {
     ...lieu,
     videos: videos || [],
     evenements: evenements || [],
-    contacts: contacts || []
+    contacts: contacts || [],
+    reseaux_sociaux: lieu.reseaux_sociaux ? 
+      (typeof lieu.reseaux_sociaux === 'string' ? 
+        JSON.parse(lieu.reseaux_sociaux) : lieu.reseaux_sociaux) : 
+      {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: '',
+        youtube: '',
+        website: ''
+      }
   };
 }
 
 async function getLieuxByUser(userId) {
-  const { data, error } = await supabase
+  // Récupérer les lieux de base
+  const { data: lieux, error } = await supabase
     .from('lieux')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
+  
   if (error) throw error;
-  return data;
+  
+  // Pour chaque lieu, récupérer les relations
+  const lieuxComplets = await Promise.all(
+    lieux.map(async (lieu) => {
+      // Récupérer les vidéos
+      const { data: videos } = await supabase
+        .from('videos_lieu')
+        .select('*')
+        .eq('lieu_id', lieu.id)
+        .order('est_principale', { ascending: false })
+        .order('created_at', { ascending: false });
+
+      // Récupérer les événements
+      const { data: evenements } = await supabase
+        .from('evenements_lieu')
+        .select('*')
+        .eq('lieu_id', lieu.id)
+        .order('date_debut', { ascending: true });
+
+      // Récupérer les contacts
+      const { data: contacts } = await supabase
+        .from('contacts_lieu')
+        .select('*')
+        .eq('lieu_id', lieu.id)
+        .order('est_principal', { ascending: false })
+        .order('nom_contact', { ascending: true });
+
+      // Retourner le lieu avec toutes ses relations
+      return {
+        ...lieu,
+        videos: videos || [],
+        evenements: evenements || [],
+        contacts: contacts || [],
+        reseaux_sociaux: lieu.reseaux_sociaux ? 
+          (typeof lieu.reseaux_sociaux === 'string' ? 
+            JSON.parse(lieu.reseaux_sociaux) : lieu.reseaux_sociaux) : 
+          {
+            facebook: '',
+            instagram: '',
+            twitter: '',
+            linkedin: '',
+            youtube: '',
+            website: ''
+          }
+      };
+    })
+  );
+  
+  return lieuxComplets;
 }
 
 async function getLikedLieux(userId) {
