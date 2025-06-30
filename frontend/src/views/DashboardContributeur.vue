@@ -192,7 +192,12 @@ const loadData = async () => {
       axios.get('/api/lieux/user/stats', { headers })
     ])
 
-    lieuxRecents.value = lieuxResponse.data
+    if (Array.isArray(lieuxResponse.data)) {
+      lieuxRecents.value = lieuxResponse.data
+    } else {
+      console.error('Réponse inattendue:', lieuxResponse.data)
+      lieuxRecents.value = []
+    }
     totalLieux.value = statsResponse.data.totalLieux
     lieuxEnAttente.value = statsResponse.data.lieuxEnAttente
     lieuxValides.value = statsResponse.data.lieuxValides

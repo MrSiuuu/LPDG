@@ -125,7 +125,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { supabase } from '../supabase'
-import axios from 'axios'
+import api from '../utils/api'
 
 const props = defineProps({
   search: {
@@ -153,11 +153,7 @@ const lieuxFiltres = computed(() => {
 async function fetchLieux() {
   loading.value = true
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-
-    const response = await axios.get('/api/lieux', { headers })
+    const response = await api.get('/api/lieux')
     const lieuxData = response.data
 
     // Enrichir les données avec les likes et visites
@@ -202,11 +198,7 @@ async function checkIfLiked(lieuId) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-
-    const response = await axios.get(`/api/lieux/${lieuId}/has-liked`, { headers })
+    const response = await api.get(`/api/lieux/${lieuId}/has-liked`)
     return response.data.hasLiked
   } catch (error) {
     return false
@@ -219,11 +211,7 @@ async function checkIfVisited(lieuId) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return false
 
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-
-    const response = await axios.get(`/api/lieux/${lieuId}/has-visited`, { headers })
+    const response = await api.get(`/api/lieux/${lieuId}/has-visited`)
     return response.data.hasVisited
   } catch (error) {
     return false
@@ -240,11 +228,7 @@ async function toggleLike(lieuId) {
       return
     }
 
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-
-    await axios.post(`/api/lieux/${lieuId}/like`, {}, { headers })
+    await api.post(`/api/lieux/${lieuId}/like`)
     
     // Mettre à jour l'état local
     const lieu = lieux.value.find(l => l.id === lieuId)
@@ -266,15 +250,11 @@ async function toggleVisite(lieuId) {
       return
     }
 
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-
     const lieu = lieux.value.find(l => l.id === lieuId)
     if (lieu.hasVisited) {
-      await axios.delete(`/api/lieux/${lieuId}/visite`, { headers })
+      await api.delete(`/api/lieux/${lieuId}/visite`)
     } else {
-      await axios.post(`/api/lieux/${lieuId}/visite`, {}, { headers })
+      await api.post(`/api/lieux/${lieuId}/visite`)
     }
     
     // Mettre à jour l'état local

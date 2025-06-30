@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Configuration de base pour axios
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
@@ -11,10 +11,15 @@ const api = axios.create({
 
 // Intercepteur pour ajouter le token d'authentification
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('supabase.auth.token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+  async (config) => {
+    try {
+      // Récupérer le token depuis Supabase
+      const { data: { session } } = await import('../supabase').then(m => m.supabase.auth.getSession())
+      if (session?.access_token) {
+        config.headers.Authorization = `Bearer ${session.access_token}`
+      }
+    } catch (error) {
+      console.error('Erreur lors de la récupération du token:', error)
     }
     return config
   },
@@ -29,7 +34,6 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Rediriger vers la page de connexion si non authentifié
-      localStorage.removeItem('supabase.auth.token')
       window.location.href = '/login'
     }
     return Promise.reject(error)

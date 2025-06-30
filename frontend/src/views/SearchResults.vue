@@ -121,10 +121,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { supabase } from '../supabase'
-import axios from 'axios'
+import api from '../utils/api'
 import Navbar from '../components/Navbar.vue'
 
 const route = useRoute()
@@ -138,11 +138,7 @@ const searchQuery = computed(() => route.query.q || '')
 async function fetchLieux() {
   loading.value = true
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    
-    const response = await axios.get(`/api/lieux/search?query=${encodeURIComponent(searchQuery.value)}`, { headers })
+    const response = await api.get(`/api/lieux/search?query=${encodeURIComponent(searchQuery.value)}`)
     lieux.value = response.data
     totalResults.value = response.data.length
   } catch (error) {
@@ -157,28 +153,19 @@ async function fetchLieux() {
 // Fonction pour basculer le statut "visité"
 const toggleVisite = async (lieuId) => {
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    
-    if (!token) {
-      alert('Vous devez être connecté pour marquer un lieu comme visité')
-      return
-    }
-
     const lieu = lieux.value.find(l => l.id === lieuId)
     if (lieu.hasVisited) {
-      await axios.delete(`/api/lieux/${lieuId}/visites`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await api.delete(`/api/lieux/${lieuId}/visite`)
       lieu.hasVisited = false
     } else {
-      await axios.post(`/api/lieux/${lieuId}/visites`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+      await api.post(`/api/lieux/${lieuId}/visite`)
       lieu.hasVisited = true
     }
   } catch (error) {
     console.error('Erreur lors du toggle visite:', error)
+    if (error.response?.status === 401) {
+      alert('Vous devez être connecté pour marquer un lieu comme visité')
+    }
   }
 }
 
@@ -187,6 +174,15 @@ onMounted(() => {
     fetchLieux()
   }
 })
+
+watch(
+  () => route.query.q,
+  (newQuery, oldQuery) => {
+    if (newQuery !== oldQuery) {
+      fetchLieux()
+    }
+  }
+)
 </script>
 
 <style scoped>

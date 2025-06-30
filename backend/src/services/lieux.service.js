@@ -512,6 +512,7 @@ async function searchLieux(query) {
     .from('lieux')
     .select('*')
     .or(`nom.ilike.%${query}%,ville.ilike.%${query}%,type.ilike.%${query}%,description.ilike.%${query}%,adresse.ilike.%${query}%`)
+    .eq('est_valide', true)
     .order('created_at', { ascending: false });
   if (error) throw error;
   return data;
