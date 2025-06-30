@@ -95,9 +95,9 @@ onMounted(fetchArticles)
           <h1 class="text-3xl font-bold mb-6">Bienvenue sur LPDG</h1>
           <div v-if="loading" class="text-center">Chargement...</div>
           <div v-else-if="articles.length === 0" class="text-center text-gray-500">Aucun article trouvé.</div>
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!--<div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <ArticleCard v-for="article in articles" :key="article.id" :article="article" />
-          </div>
+          </div>-->
         </div>
         <LieuxAccueil />
       </div>
