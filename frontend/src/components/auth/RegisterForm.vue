@@ -49,8 +49,23 @@
           <div>
             <label class="text-slate-800 text-sm font-medium mb-2 block">Mot de passe</label>
             <div class="relative flex items-center">
-              <input v-model="password" name="password" type="password" required class="text-slate-800 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500" placeholder="Entrez votre mot de passe" />
-              <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-4 h-4 absolute right-4 cursor-pointer" viewBox="0 0 128 128">
+              <input
+                v-model="password"
+                name="password"
+                :type="showPassword ? 'text' : 'password'"
+                required
+                class="text-slate-800 bg-white border border-slate-300 w-full text-sm pl-4 pr-8 py-2.5 rounded-md outline-blue-500"
+                placeholder="Entrez votre mot de passe"
+              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="#bbb"
+                stroke="#bbb"
+                class="w-4 h-4 absolute right-4 cursor-pointer"
+                viewBox="0 0 128 128"
+                @click="showPassword = !showPassword"
+                :title="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+              >
                 <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z" data-original="#000000"></path>
               </svg>
             </div>
@@ -68,7 +83,12 @@
           </button>
         </div>
         <div v-if="confirmationMessage" class="text-green-600 text-center mt-4">{{ confirmationMessage }}</div>
-        <div v-if="errorMessage" class="text-red-600 text-center mt-4">{{ errorMessage }}</div>
+        <div v-if="errorMessage" class="text-red-600 text-center mt-4">
+          {{ errorMessage }}
+          <template v-if="errorMessage.includes('déjà un compte')">
+            <router-link to="/login" class="text-blue-600 font-medium hover:underline ml-1">Se connecter</router-link>
+          </template>
+        </div>
         <p class="text-slate-600 text-sm mt-6 text-center">Vous avez déjà un compte ? <router-link to="/login" class="text-blue-600 font-medium hover:underline ml-1">Se connecter</router-link></p>
       </form>
     </div>
@@ -77,8 +97,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import api from '../../utils/api'
 
 const nom = ref('')
 const email = ref('')
@@ -87,6 +107,7 @@ const acceptTerms = ref(false)
 const confirmationMessage = ref('')
 const errorMessage = ref('')
 const loading = ref(false)
+const showPassword = ref(false)
 const router = useRouter()
 
 const handleRegister = async () => {
@@ -96,23 +117,36 @@ const handleRegister = async () => {
     errorMessage.value = 'Vous devez accepter les conditions.'
     return
   }
+  if (password.value.length < 6) {
+    errorMessage.value = 'Le mot de passe doit contenir au moins 6 caractères.'
+    return
+  }
   loading.value = true
   try {
-    const { data } = await axios.post('/api/auth/signup', {
+    const { data } = await api.post('/api/auth/signup', {
       nom: nom.value,
       email: email.value,
       password: password.value,
       role: 'user'
     })
-    confirmationMessage.value = data.message || 'Compte créé avec succès. Vérifiez votre boîte mail.'
+    confirmationMessage.value = 'Compte créé avec succès. Vérifiez votre boîte mail pour confirmer votre inscription.'
     nom.value = ''
     email.value = ''
     password.value = ''
     acceptTerms.value = false
-    // Optionnel : rediriger après quelques secondes
     // setTimeout(() => router.push('/login'), 2000)
   } catch (error) {
-    errorMessage.value = error.response?.data?.error || 'Erreur lors de la création du compte.'
+    // Gestion des erreurs courantes en français
+    const msg = error.response?.data?.error || ''
+    if (msg.includes('password')) {
+      errorMessage.value = 'Le mot de passe est trop court ou trop faible.'
+    } else if (msg.includes('email') && msg.includes('exists')) {
+      errorMessage.value = 'Vous avez déjà un compte, veuillez vous connecter.'
+    } else if (msg.includes('email')) {
+      errorMessage.value = 'Adresse e-mail invalide ou déjà utilisée.'
+    } else {
+      errorMessage.value = 'Erreur lors de la création du compte.'
+    }
   } finally {
     loading.value = false
   }

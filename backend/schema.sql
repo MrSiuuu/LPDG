@@ -25,7 +25,8 @@ CREATE TABLE user_profiles (
     role_id INT REFERENCES roles(id) NOT NULL,
     compteur_visite INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    prenom TEXT
 );
 
 -- Table des lieux touristiques

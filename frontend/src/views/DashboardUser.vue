@@ -181,6 +181,7 @@
         <div v-show="activeTab === 'profil'">
           <h2 class="text-2xl font-bold mb-6 text-gray-900">Mon profil</h2>
           <ProfileEdit :profile="profile" @update="handleProfileUpdate" />
+          <div v-if="successMessage" class="text-green-600 text-center mt-4 font-semibold">{{ successMessage }}</div>
         </div>
       </div>
     </main>
@@ -220,6 +221,7 @@ const likedLieux = ref([])
 const visitedLieux = ref([])
 const loadingLikedLieux = ref(false)
 const loadingVisitedLieux = ref(false)
+const successMessage = ref('')
 
 const navItems = [
   { label: 'Dashboard', tab: 'dashboard', icon: '📊' },
@@ -302,12 +304,22 @@ const unlikeLieu = async (lieuId) => {
 
 const handleProfileUpdate = async (updatedProfile) => {
   try {
+    // Toujours inclure les champs obligatoires depuis le profil actuel si non modifiés
+    const payload = {
+      ...profile.value, // tous les champs actuels
+      ...updatedProfile // écrase ceux modifiés par l'utilisateur
+    }
+    // On ne garde que les champs pertinents pour la table user_profiles
+    const { nom, email, role_id, prenom, adresse, ville, telephone, photo } = payload
+
     const { error } = await supabase
       .from('user_profiles')
-      .update(updatedProfile)
+      .update({ nom, email, role_id, prenom, adresse, ville, telephone, photo })
       .eq('id', profile.value.id)
     if (error) throw error
     profile.value = { ...profile.value, ...updatedProfile }
+    successMessage.value = 'Vous avez mis à jour votre profil avec succès.'
+    setTimeout(() => { successMessage.value = '' }, 4000)
   } catch (error) {
     alert('Erreur lors de la mise à jour du profil : ' + error.message)
   }
