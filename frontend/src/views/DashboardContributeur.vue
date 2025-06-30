@@ -187,22 +187,37 @@ const loadData = async () => {
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    const [lieuxResponse, statsResponse] = await Promise.all([
-      axios.get('/api/lieux/user/lieux', { headers }),
-      axios.get('/api/lieux/user/stats', { headers })
-    ])
+    // Récupérer l'utilisateur connecté
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      console.error('Utilisateur non connecté')
+      return
+    }
 
+    // Utiliser /api/lieux au lieu de /api/lieux/user/lieux
+    const lieuxResponse = await axios.get('/api/lieux', { headers })
+    
     if (Array.isArray(lieuxResponse.data)) {
-      lieuxRecents.value = lieuxResponse.data
+      // Filtrer pour ne garder que les lieux du contributeur connecté
+      lieuxRecents.value = lieuxResponse.data.filter(lieu => lieu.user_id === user.id)
     } else {
       console.error('Réponse inattendue:', lieuxResponse.data)
       lieuxRecents.value = []
     }
-    totalLieux.value = statsResponse.data.totalLieux
-    lieuxEnAttente.value = statsResponse.data.lieuxEnAttente
-    lieuxValides.value = statsResponse.data.lieuxValides
+
+    // Calculer les statistiques côté frontend
+    const lieuxDuUser = lieuxResponse.data.filter(lieu => lieu.user_id === user.id)
+    totalLieux.value = lieuxDuUser.length
+    lieuxValides.value = lieuxDuUser.filter(lieu => lieu.est_valide === true).length
+    lieuxEnAttente.value = lieuxDuUser.filter(lieu => lieu.est_valide === false).length
+
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)
+    // En cas d'erreur, initialiser avec des valeurs par défaut
+    lieuxRecents.value = []
+    totalLieux.value = 0
+    lieuxEnAttente.value = 0
+    lieuxValides.value = 0
   }
   loading.value = false
 }
