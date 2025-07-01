@@ -219,7 +219,7 @@ import LieuEvenements from '../components/LieuEvenements.vue'
 import LieuContacts from '../components/LieuContacts.vue'
 import LieuRessources from '../components/LieuRessources.vue'
 import LieuPartage from '../components/LieuPartage.vue'
-import axios from 'axios'
+import api from '../utils/api'
 
 const route = useRoute()
 const router = useRouter()
@@ -259,10 +259,7 @@ async function fetchUser() {
 async function fetchHasVisited() {
   if (!lieuId.value) return
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const { data } = await axios.get(`/api/lieux/${lieuId.value}/has-visited`, { headers })
+    const { data } = await api.get(`/lieux/${lieuId.value}/has-visited`)
     hasVisited.value = data?.hasVisited || false
   } catch (e) {
     hasVisited.value = false
@@ -272,14 +269,11 @@ async function fetchHasVisited() {
 async function toggleVisite() {
   if (!lieuId.value) return
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
     if (!hasVisited.value) {
-      await axios.post(`/api/lieux/${lieuId.value}/visite`, {}, { headers })
+      await api.post(`/lieux/${lieuId.value}/visite`, {})
       hasVisited.value = true
     } else {
-      await axios.delete(`/api/lieux/${lieuId.value}/visite`, { headers })
+      await api.delete(`/lieux/${lieuId.value}/visite`)
       hasVisited.value = false
     }
   } catch (e) {
@@ -309,10 +303,7 @@ async function fetchAvis() {
 async function submitAvis() {
   if (!newAvis.value.note || !newAvis.value.commentaire || !lieuId.value) return
   try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    await axios.post(`/api/lieux/${lieuId.value}/avis`, newAvis.value, { headers })
+    await api.post(`/lieux/${lieuId.value}/avis`, newAvis.value)
     newAvis.value.note = ''
     newAvis.value.commentaire = ''
     await fetchAvis()
