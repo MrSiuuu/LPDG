@@ -90,7 +90,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import axios from 'axios'
+import api from '../utils/api'
 import { supabase } from '../supabase'
 
 const props = defineProps({
@@ -144,21 +144,15 @@ const submitSignalement = async () => {
   try {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
-    
     if (!token) {
       throw new Error('Vous devez être connecté pour signaler un lieu')
     }
-
     const motif = `${selectedMotif.value}: ${description.value.trim()}`
-    
-    const response = await axios.post(
+    const response = await api.post(
       `/api/signalements/lieux/${props.lieuId}`,
       { motif },
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+      { headers: { Authorization: `Bearer ${token}` } }
     )
-
     if (response.data.success) {
       success.value = 'Signalement envoyé avec succès. Merci pour votre contribution !'
       setTimeout(() => {
@@ -166,7 +160,6 @@ const submitSignalement = async () => {
         emit('close')
       }, 2000)
     }
-
   } catch (err) {
     console.error('Erreur lors du signalement:', err)
     error.value = err.response?.data?.error || 'Erreur lors de l\'envoi du signalement'

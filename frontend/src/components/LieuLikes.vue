@@ -39,7 +39,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import api from '../utils/api'
 import { supabase } from '../supabase'
 
 const router = useRouter()
@@ -71,12 +71,12 @@ async function fetchLikes() {
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
     
     // Récupérer le nombre de likes
-    const { data: likesData } = await axios.get(`/api/lieux/${props.lieuId}/likes`, { headers })
+    const { data: likesData } = await api.get(`/api/lieux/${props.lieuId}/likes`, { headers })
     likes.value = likesData?.count || 0
     
     // Récupérer si l'utilisateur a liké
     if (token) {
-      const { data: hasLikedData } = await axios.get(`/api/lieux/${props.lieuId}/has-liked`, { headers })
+      const { data: hasLikedData } = await api.get(`/api/lieux/${props.lieuId}/has-liked`, { headers })
       hasLiked.value = hasLikedData?.hasLiked || false
     }
   } catch (e) {
@@ -114,7 +114,7 @@ async function like() {
     }
     
     const headers = { Authorization: `Bearer ${token}` }
-    const response = await axios.post(`/api/lieux/${props.lieuId}/like`, {}, { headers })
+    const response = await api.post(`/api/lieux/${props.lieuId}/like`, {}, { headers })
     
     // Mettre à jour l'état local
     if (response.data.action === 'liked') {

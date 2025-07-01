@@ -19,7 +19,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import axios from 'axios'
+import api from '../utils/api'
 import { supabase } from '../supabase'
 const props = defineProps({ articleId: Number })
 const show = ref(false)
@@ -38,7 +38,7 @@ async function fetchComments() {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const { data } = await axios.get(`/api/articles/${props.articleId}/comments`, { headers })
+    const { data } = await api.get(`/api/articles/${props.articleId}/comments`, { headers })
     comments.value = data || []
   } catch (e) {
     comments.value = []
@@ -50,7 +50,7 @@ async function addComment() {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    await axios.post(`/api/articles/${props.articleId}/comments`, { texte: newComment.value }, { headers })
+    await api.post(`/api/articles/${props.articleId}/comments`, { texte: newComment.value }, { headers })
     newComment.value = ''
     fetchComments()
   } catch (e) {}
