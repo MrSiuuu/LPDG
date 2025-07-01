@@ -59,22 +59,22 @@
             Connecté en tant que <b>{{ role }}</b>
           </div>
           <template v-if="role === 'user'">
-            <router-link to="/dashboard-user" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Mon espace</router-link>
+            <router-link to="/dashboard-user" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Mon espace</router-link>
           </template>
           <template v-else-if="role === 'contributor'">
-            <router-link to="/dashboard-contributeur" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Espace Contributeur</router-link>
+            <router-link to="/dashboard-contributeur" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Espace Contributeur</router-link>
           </template>
           <template v-else-if="role === 'blogger'">
-            <router-link to="/dashboard-blogueur" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Espace Blogueur</router-link>
+            <router-link to="/dashboard-blogueur" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Espace Blogueur</router-link>
           </template>
           <template v-else-if="role === 'admin'">
-            <router-link to="/adminlpdg" class="block px-3 py-2 text-base text-red-700 hover:bg-gray-100 rounded-md">Admin</router-link>
+            <router-link to="/adminlpdg" @click="showMenu = false" class="block px-3 py-2 text-base text-red-700 hover:bg-gray-100 rounded-md">Admin</router-link>
           </template>
           <button @click="handleLogout" class="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md">Déconnexion</button>
         </template>
         <template v-else>
-          <router-link to="/login" class="block px-3 py-2 text-base text-gray-800 hover:bg-gray-100 rounded-md">Connexion</router-link>
-          <router-link to="/register" class="block px-3 py-2 text-base text-gray-800 hover:bg-gray-100 rounded-md">Inscription</router-link>
+          <router-link to="/login" @click="showMenu = false" class="block px-3 py-2 text-base text-gray-800 hover:bg-gray-100 rounded-md">Connexion</router-link>
+          <router-link to="/register" @click="showMenu = false" class="block px-3 py-2 text-base text-gray-800 hover:bg-gray-100 rounded-md">Inscription</router-link>
         </template>
       </div>
     </div>
@@ -100,11 +100,33 @@ const onSearch = () => {
   }
 }
 
-const handleLogout = () => {
-  localStorage.removeItem('user_role')
-  role.value = null
-  isAuthenticated.value = false
-  router.push('/login')
+const handleLogout = async () => {
+  try {
+    // Déconnexion Supabase (invalide le token)
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error('Erreur lors de la déconnexion Supabase:', error)
+    }
+    
+    // Nettoyer localStorage
+    localStorage.removeItem('user_role')
+    localStorage.removeItem('user_id')
+    
+    // Mettre à jour l'état local
+    role.value = null
+    isAuthenticated.value = false
+    
+    // Redirection
+    router.push('/login')
+  } catch (error) {
+    console.error('Erreur lors de la déconnexion:', error)
+    // Même en cas d'erreur, on nettoie localStorage et on redirige
+    localStorage.removeItem('user_role')
+    localStorage.removeItem('user_id')
+    role.value = null
+    isAuthenticated.value = false
+    router.push('/login')
+  }
 }
 
 const toggleMenu = () => {
@@ -132,6 +154,9 @@ onMounted(() => {
       checkRole()
     } else if (event === 'SIGNED_OUT') {
       // L'utilisateur vient de se déconnecter
+      // Nettoyer complètement l'état
+      localStorage.removeItem('user_role')
+      localStorage.removeItem('user_id')
       role.value = null
       isAuthenticated.value = false
     }

@@ -38,7 +38,7 @@
           <LieuLikes :lieuId="lieuId" />
           <button
             v-if="lieuId"
-            @click="toggleVisite"
+            @click="handleToggleVisite"
             :class="[
               'btn btn-xs',
               hasVisited ? 'bg-green-100 text-green-700 border-green-300' : 'bg-gray-100 text-gray-700 border-gray-300',
@@ -53,6 +53,18 @@
             v-if="lieuId && user"
             @click="showSignalementModal = true"
             class="btn btn-xs bg-red-100 text-red-700 border-red-300 rounded-full px-3 py-1 border transition-all duration-200 hover:bg-red-200"
+          >
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            Signaler
+          </button>
+          <!-- Bouton Signaler pour utilisateurs non connectés -->
+          <button
+            v-if="lieuId && !user"
+            @click="showLoginModal = true"
+            class="btn btn-xs bg-gray-100 text-gray-600 border-gray-300 rounded-full px-3 py-1 border transition-all duration-200 hover:bg-gray-200"
+            title="Connectez-vous pour signaler ce lieu"
           >
             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -100,7 +112,9 @@
     <!-- Avis -->
     <div class="bg-white rounded-lg shadow p-6 mt-8">
       <h2 class="text-xl font-bold mb-4 text-indigo-700">Avis des visiteurs</h2>
-      <form @submit.prevent="submitAvis" class="mb-6 flex flex-col gap-3 bg-gray-50 p-4 rounded">
+      
+      <!-- Formulaire d'avis pour utilisateurs connectés -->
+      <form v-if="user" @submit.prevent="submitAvis" class="mb-6 flex flex-col gap-3 bg-gray-50 p-4 rounded">
         <div class="flex items-center gap-2">
           <label class="font-semibold">Note :</label>
           <select v-model="newAvis.note" required class="border rounded px-2 py-1">
@@ -111,6 +125,30 @@
         <textarea v-model="newAvis.commentaire" required rows="2" placeholder="Votre commentaire..." class="border rounded px-2 py-1"></textarea>
         <button type="submit" class="self-end bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Envoyer</button>
       </form>
+      
+      <!-- Message d'invitation à la connexion pour les avis -->
+      <div v-else class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="text-blue-500">🔐</span>
+          <span class="text-sm font-medium text-blue-800">Connexion requise</span>
+        </div>
+        <p class="text-sm text-blue-600 mb-3">Connectez-vous pour laisser un avis sur ce lieu</p>
+        <div class="flex gap-2">
+          <button 
+            @click="goToLogin" 
+            class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 text-sm"
+          >
+            Se connecter
+          </button>
+          <button 
+            @click="goToRegister" 
+            class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-sm"
+          >
+            S'inscrire
+          </button>
+        </div>
+      </div>
+
       <div v-if="loadingAvis" class="text-gray-500">Chargement des avis...</div>
       <div v-else-if="avis.length === 0" class="text-gray-400">Aucun avis pour ce lieu.</div>
       <div v-else class="space-y-4">
@@ -132,12 +170,47 @@
       @close="showSignalementModal = false"
       @signalement-created="onSignalementCreated"
     />
+    
+    <!-- Modal d'invitation à la connexion -->
+    <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+            <span class="text-2xl">🔐</span>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Connexion requise</h3>
+          <p class="text-sm text-gray-600 mb-6">
+            Connectez-vous pour interagir avec ce lieu (visites, avis, signalements)
+          </p>
+          <div class="flex gap-3 justify-center">
+            <button 
+              @click="goToLogin" 
+              class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+            >
+              Se connecter
+            </button>
+            <button 
+              @click="goToRegister" 
+              class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              S'inscrire
+            </button>
+            <button 
+              @click="showLoginModal = false" 
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { supabase } from '../supabase'
 import LieuLikes from '../components/LieuLikes.vue'
 import SignalementModal from '../components/SignalementModal.vue'
@@ -149,12 +222,14 @@ import LieuPartage from '../components/LieuPartage.vue'
 import axios from 'axios'
 
 const route = useRoute()
+const router = useRouter()
 const lieu = ref({})
 const hasVisited = ref(false)
 const avis = ref([])
 const loadingAvis = ref(false)
 const newAvis = ref({ note: '', commentaire: '' })
 const showSignalementModal = ref(false)
+const showLoginModal = ref(false)
 const user = ref(null)
 
 // Récupérer l'ID du lieu depuis la route et le convertir en nombre
@@ -247,6 +322,27 @@ async function submitAvis() {
 function onSignalementCreated() {
   // Optionnel : afficher un message de confirmation ou rafraîchir les données
   console.log('Signalement créé avec succès')
+}
+
+async function handleToggleVisite() {
+  if (!lieuId.value) return
+  
+  if (!user.value) {
+    showLoginModal.value = true
+    return
+  }
+  
+  await toggleVisite()
+}
+
+function goToLogin() {
+  showLoginModal.value = false
+  router.push('/login')
+}
+
+function goToRegister() {
+  showLoginModal.value = false
+  router.push('/register')
 }
 
 onMounted(async () => {

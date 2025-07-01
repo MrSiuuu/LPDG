@@ -1,26 +1,63 @@
 <template>
-  <div class="flex items-center gap-1">
+  <div class="flex items-center gap-1 relative">
     <button 
       class="btn btn-xs btn-ghost" 
-      @click="like" 
-      :disabled="!isConnected || !lieuId"
+      @click="handleLike" 
+      :disabled="!lieuId"
       :class="{ 'text-red-500': hasLiked }"
+      :title="!isConnected ? 'Connectez-vous pour liker ce lieu' : ''"
     >
       {{ hasLiked ? '❤️' : '🤍' }}
     </button>
     <span class="text-xs">{{ likes }}</span>
+    
+    <!-- Message d'invitation à la connexion -->
+    <div v-if="showLoginMessage" class="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-3 z-50 mt-8 -ml-20 w-48">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="text-blue-500">🔐</span>
+        <span class="text-sm font-medium text-gray-800">Connexion requise</span>
+      </div>
+      <p class="text-xs text-gray-600 mb-3">Connectez-vous pour liker ce lieu</p>
+      <div class="flex gap-2">
+        <button 
+          @click="goToLogin" 
+          class="text-xs bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+        >
+          Se connecter
+        </button>
+        <button 
+          @click="showLoginMessage = false" 
+          class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded hover:bg-gray-300"
+        >
+          Annuler
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 import { supabase } from '../supabase'
 
+const router = useRouter()
 const props = defineProps({ lieuId: Number })
 const likes = ref(0)
 const hasLiked = ref(false)
-const isConnected = !!localStorage.getItem('user_id')
+const showLoginMessage = ref(false)
+const isConnected = ref(false)
+
+// Vérifier l'authentification réelle
+async function checkAuth() {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    isConnected.value = !!user
+  } catch (error) {
+    isConnected.value = false
+  }
+}
 
 async function fetchLikes() {
   if (!props.lieuId) {
@@ -49,12 +86,24 @@ async function fetchLikes() {
   }
 }
 
-async function like() {
+async function handleLike() {
   if (!props.lieuId) {
     console.error('lieuId non défini')
     return
   }
 
+  // Vérifier l'authentification avant de continuer
+  await checkAuth()
+  
+  if (!isConnected.value) {
+    showLoginMessage.value = true
+    return
+  }
+
+  await like()
+}
+
+async function like() {
   try {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
@@ -82,13 +131,19 @@ async function like() {
   }
 }
 
+function goToLogin() {
+  showLoginMessage.value = false
+  router.push('/login')
+}
+
 watch(() => props.lieuId, (newId) => {
   if (newId) {
     fetchLikes()
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
+  await checkAuth()
   if (props.lieuId) {
     fetchLikes()
   }

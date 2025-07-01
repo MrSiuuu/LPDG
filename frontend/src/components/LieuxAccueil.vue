@@ -119,13 +119,51 @@
         </div>
       </div>
     </div>
+    
+    <!-- Modal d'invitation à la connexion -->
+    <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+            <span class="text-2xl">🔐</span>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Connexion requise</h3>
+          <p class="text-sm text-gray-600 mb-6">
+            Connectez-vous pour interagir avec les lieux (likes, visites)
+          </p>
+          <div class="flex gap-3 justify-center">
+            <button 
+              @click="goToLogin" 
+              class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+            >
+              Se connecter
+            </button>
+            <button 
+              @click="goToRegister" 
+              class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              S'inscrire
+            </button>
+            <button 
+              @click="showLoginModal = false" 
+              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { supabase } from '../supabase'
 import api from '../utils/api'
+
+const router = useRouter()
 
 const props = defineProps({
   search: {
@@ -136,6 +174,7 @@ const props = defineProps({
 
 const lieux = ref([])
 const loading = ref(true)
+const showLoginModal = ref(false)
 
 const lieuxFiltres = computed(() => {
   if (!props.search || !props.search.trim()) return lieux.value
@@ -223,8 +262,7 @@ async function toggleLike(lieuId) {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      // Rediriger vers la page de connexion
-      window.location.href = '/login'
+      showLoginModal.value = true
       return
     }
 
@@ -245,8 +283,7 @@ async function toggleVisite(lieuId) {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      // Rediriger vers la page de connexion
-      window.location.href = '/login'
+      showLoginModal.value = true
       return
     }
 
@@ -262,6 +299,16 @@ async function toggleVisite(lieuId) {
   } catch (error) {
     console.error('Erreur lors de la visite:', error)
   }
+}
+
+function goToLogin() {
+  showLoginModal.value = false
+  router.push('/login')
+}
+
+function goToRegister() {
+  showLoginModal.value = false
+  router.push('/register')
 }
 
 onMounted(fetchLieux)

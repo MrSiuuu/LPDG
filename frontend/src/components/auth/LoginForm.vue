@@ -62,7 +62,6 @@ const handleLogin = async () => {
 
   const role = profile.roles.label
   localStorage.setItem('user_role', role)
-  localStorage.setItem('user_id', data.user.id)
 
   // Redirection selon le rôle
   if (role === 'admin') {
