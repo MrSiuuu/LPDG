@@ -68,16 +68,22 @@ async function fetchLikes() {
   try {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
     
-    // Récupérer le nombre de likes
-    const { data: likesData } = await api.get(`/api/lieux/${props.lieuId}/likes`, { headers })
+    // Récupérer le nombre de likes (pas besoin d'authentification)
+    const { data: likesData } = await api.get(`/api/lieux/${props.lieuId}/likes`)
     likes.value = likesData?.count || 0
     
-    // Récupérer si l'utilisateur a liké
+    // Récupérer si l'utilisateur a liké (seulement si connecté)
     if (token) {
-      const { data: hasLikedData } = await api.get(`/api/lieux/${props.lieuId}/has-liked`, { headers })
-      hasLiked.value = hasLikedData?.hasLiked || false
+      try {
+        const { data: hasLikedData } = await api.get(`/api/lieux/${props.lieuId}/has-liked`)
+        hasLiked.value = hasLikedData?.hasLiked || false
+      } catch (e) {
+        // Si erreur 401, l'utilisateur n'a pas liké
+        hasLiked.value = false
+      }
+    } else {
+      hasLiked.value = false
     }
   } catch (e) {
     console.error('Erreur lors de la récupération des likes:', e.response?.data || e.message)

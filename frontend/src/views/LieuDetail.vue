@@ -358,7 +358,12 @@ onMounted(async () => {
 
   if (!data.images) data.images = []
   lieu.value = data || {}
-  await fetchHasVisited()
+  
+  // Ne vérifier si l'utilisateur a visité que s'il est connecté
+  if (user.value) {
+    await fetchHasVisited()
+  }
+  
   await fetchAvis()
 })
 </script>
