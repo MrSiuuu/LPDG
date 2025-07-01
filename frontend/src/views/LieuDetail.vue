@@ -259,7 +259,7 @@ async function fetchUser() {
 async function fetchHasVisited() {
   if (!lieuId.value) return
   try {
-    const { data } = await api.get(`/lieux/${lieuId.value}/has-visited`)
+    const { data } = await api.get(`/api/lieux/${lieuId.value}/has-visited`)
     hasVisited.value = data?.hasVisited || false
   } catch (e) {
     hasVisited.value = false
@@ -270,10 +270,10 @@ async function toggleVisite() {
   if (!lieuId.value) return
   try {
     if (!hasVisited.value) {
-      await api.post(`/lieux/${lieuId.value}/visite`, {})
+      await api.post(`/api/lieux/${lieuId.value}/visite`, {})
       hasVisited.value = true
     } else {
-      await api.delete(`/lieux/${lieuId.value}/visite`)
+      await api.delete(`/api/lieux/${lieuId.value}/visite`)
       hasVisited.value = false
     }
   } catch (e) {
@@ -303,7 +303,7 @@ async function fetchAvis() {
 async function submitAvis() {
   if (!newAvis.value.note || !newAvis.value.commentaire || !lieuId.value) return
   try {
-    await api.post(`/lieux/${lieuId.value}/avis`, newAvis.value)
+    await api.post(`/api/lieux/${lieuId.value}/avis`, newAvis.value)
     newAvis.value.note = ''
     newAvis.value.commentaire = ''
     await fetchAvis()
