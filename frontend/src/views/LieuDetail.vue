@@ -262,6 +262,8 @@ async function fetchHasVisited() {
     const { data } = await api.get(`/api/lieux/${lieuId.value}/has-visited`)
     hasVisited.value = data?.hasVisited || false
   } catch (e) {
+    // Si erreur 401 (non connecté), on considère que l'utilisateur n'a pas visité
+    // Pas de redirection automatique
     hasVisited.value = false
   }
 }

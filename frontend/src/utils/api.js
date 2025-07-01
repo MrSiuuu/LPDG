@@ -32,10 +32,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Rediriger vers la page de connexion si non authentifié
-      window.location.href = '/login'
-    }
+    // Ne pas rediriger automatiquement sur les erreurs 401
+    // Laisser chaque composant gérer ses propres erreurs d'authentification
+    console.warn('Erreur API:', error.response?.status, error.response?.data)
     return Promise.reject(error)
   }
 )
