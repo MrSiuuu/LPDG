@@ -23,7 +23,8 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-6">
+    <main class="flex-1 p-6 mt-5">
+      <div v-if="profile.prenom || profile.nom" class="text-2xl font-semibold text-gray-800 mt-5">Bonjour {{ profile.prenom || profile.nom }} !</div>
       <h1 class="text-3xl font-bold mb-6 text-gray-800">Tableau de bord</h1>
 
       <!-- En-tête avec photo de profil et bouton d'édition -->

@@ -1,5 +1,5 @@
 <template>
-  <div class="pt-20 max-w-5xl mx-auto py-10 px-4 bg-white min-h-screen">
+  <div class="pt-20 max-w-5xl mx-auto py-10 px-4 bg-white">
     <button @click="$router.back()" class="mb-6 text-indigo-600 hover:underline flex items-center">
       <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />

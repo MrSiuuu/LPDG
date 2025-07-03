@@ -163,6 +163,8 @@ async function getAllLieux() {
   return data;
 }
 
+
+
 async function getLieuById(id) {
   // Récupérer le lieu principal
   const { data: lieu, error } = await supabase

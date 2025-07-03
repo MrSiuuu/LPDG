@@ -74,6 +74,56 @@ const router = createRouter({
       path: '/search',
       name: 'search-results',
       component: () => import('@/views/SearchResults.vue')
+    },
+    {
+      path: '/lieux',
+      name: 'lieux-liste-complete',
+      component: () => import('@/views/LieuxListeComplete.vue')
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('@/views/ForgotPassword.vue')
+    },
+    {
+      path: '/reset-password',
+      name: 'reset-password',
+      component: () => import('@/views/ResetPassword.vue')
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import('@/views/AboutView.vue')
+    },
+    {
+      path: '/team',
+      name: 'team',
+      component: () => import('@/views/TeamView.vue')
+    },
+    {
+      path: '/career',
+      name: 'career',
+      component: () => import('@/views/CareerView.vue')
+    },
+    {
+      path: '/contact',
+      name: 'contact',
+      component: () => import('@/views/ContactView.vue')
+    },
+    {
+      path: '/legal/terms',
+      name: 'terms',
+      component: () => import('@/views/TermsView.vue')
+    },
+    {
+      path: '/legal/privacy',
+      name: 'privacy',
+      component: () => import('@/views/PrivacyView.vue')
+    },
+    {
+      path: '/legal/mentions',
+      name: 'legal',
+      component: () => import('@/views/LegalView.vue')
     }
   ]
 })
@@ -95,6 +145,11 @@ router.beforeEach(async (to, from, next) => {
   } else {
     next()
   }
+})
+
+// Scroll to top on route change
+router.afterEach((to, from) => {
+  window.scrollTo(0, 0)
 })
 
 export default router

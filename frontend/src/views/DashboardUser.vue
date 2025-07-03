@@ -30,7 +30,8 @@
       <div class="max-w-7xl mx-auto py-4 md:py-6 px-2 sm:px-6 lg:px-8">
         <!-- Onglet Dashboard -->
         <div v-show="activeTab === 'dashboard'">
-          <h1 class="text-3xl font-bold mb-6 text-gray-900">Bienvenue {{ profile.nom }} !</h1>
+          <div v-if="profile.prenom || profile.nom" class="text-2xl font-semibold text-gray-800 mb-2">Bonjour {{ profile.prenom || profile.nom }} !</div>
+          <h1 class="text-3xl font-bold mb-6 text-gray-900">Bienvenue sur votre espace</h1>
           <div class="bg-white shadow rounded-lg mb-6">
             <div class="px-4 py-5 sm:px-6">
               <div class="flex items-center">

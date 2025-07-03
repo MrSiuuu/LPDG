@@ -15,7 +15,9 @@
               <input type="email" v-model="email" class="input input-bordered w-full" placeholder="Email" required />
               <label class="label">Password</label>
               <input type="password" v-model="password" class="input input-bordered w-full" placeholder="Password" required />
-              <div class="mt-2"><a class="link link-hover">Mot de passe oublié ?</a></div>
+              <div class="mt-2">
+                <router-link class="link link-hover" to="/forgot-password">Mot de passe oublié ?</router-link>
+              </div>
               <button type="submit" class="btn btn-neutral hover:btn-primary mt-4 w-full">Se connecter</button>
             </fieldset>
             <div v-if="confirmationMessage" class="mt-4 text-red-600 text-center">

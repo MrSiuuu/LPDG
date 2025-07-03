@@ -73,7 +73,7 @@
           <div class="flex items-center">
             <input id="terms" v-model="acceptTerms" type="checkbox" class="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded" />
             <label for="terms" class="ml-3 block text-sm text-slate-600">
-              J'accepte les <a href="#" class="text-blue-600 font-medium hover:underline ml-1">Conditions d'utilisation</a>
+              J'accepte les <router-link to="/legal/terms" class="text-blue-600 font-medium hover:underline ml-1">Conditions d'utilisation</router-link>
             </label>
           </div>
         </div>

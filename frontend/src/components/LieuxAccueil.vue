@@ -1,6 +1,15 @@
 <template>
   <div class="max-w-7xl mx-auto py-8 px-4">
-    <h2 class="text-3xl font-bold mb-8 text-gray-800 text-center">Lieux touristiques</h2>
+    <!-- Header avec titre et bouton -->
+    <div class="flex justify-between items-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-800">Lieux touristiques</h2>
+      <router-link 
+        to="/lieux" 
+        class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+      >
+        Voir tous les lieux
+      </router-link>
+    </div>
     
     <div v-if="loading" class="flex justify-center items-center py-12">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>

@@ -6,17 +6,16 @@
         <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Logo LPDG">
         <span class="self-center text-2xl font-semibold whitespace-nowrap text-gray-900">LPDG</span>
       </router-link>
-      <!-- Barre de recherche -->
+      <!-- Barre de recherche masquée car il y a déjà un filtre sur la page -->
+      <!--
       <form @submit.prevent="onSearch" class="hidden md:flex items-center mx-4 w-96 max-w-xs">
         <input v-model="searchQuery" type="text" placeholder="Rechercher un lieu, une ville..." class="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         <button type="submit" class="px-4 py-2 bg-indigo-500 text-white rounded-r-md hover:bg-indigo-600">Rechercher</button>
       </form>
+      -->
       <!-- Liens à droite -->
       <div class="flex items-center space-x-4">
         <template v-if="isAuthenticated">
-          <span class="text-gray-700 px-3 py-2 rounded-md text-sm font-medium hidden md:inline-block">
-            Connecté en tant que <b>{{ role }}</b>
-          </span>
           <template v-if="role === 'user'">
             <router-link to="/dashboard-user" class="btn btn-ghost normal-case text-base text-indigo-700 hidden md:inline-flex">Mon espace</router-link>
           </template>
@@ -47,17 +46,16 @@
     <!-- Menu mobile -->
     <div v-if="showMenu" class="md:hidden">
       <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
-        <!-- Barre de recherche mobile -->
+        <!-- Barre de recherche mobile masquée car il y a déjà un filtre sur la page -->
+        <!--
         <form @submit.prevent="onSearch" class="px-3 py-2">
           <input v-model="searchQuery" type="text" placeholder="Rechercher un lieu, une ville..." class="w-full px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           <button type="submit" class="w-full mt-2 px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600">Rechercher</button>
         </form>
+        -->
         
         <!-- Liens d'authentification mobile -->
         <template v-if="isAuthenticated">
-          <div class="px-3 py-2 text-gray-700 text-sm font-medium">
-            Connecté en tant que <b>{{ role }}</b>
-          </div>
           <template v-if="role === 'user'">
             <router-link to="/dashboard-user" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Mon espace</router-link>
           </template>

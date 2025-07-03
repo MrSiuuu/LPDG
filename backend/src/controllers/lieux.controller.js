@@ -44,6 +44,8 @@ async function getAllLieux(req, res) {
   }
 }
 
+
+
 async function getLieuById(req, res) {
   try {
     const lieu = await lieuxService.getLieuById(req.params.id);
