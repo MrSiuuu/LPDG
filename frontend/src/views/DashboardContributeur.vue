@@ -199,9 +199,19 @@ const loadData = async () => {
       console.error('Réponse inattendue:', lieuxResponse.data)
       lieuxRecents.value = []
     }
-    totalLieux.value = statsResponse.data.totalLieux
-    lieuxEnAttente.value = statsResponse.data.lieuxEnAttente
-    lieuxValides.value = statsResponse.data.lieuxValides
+    
+    // Vérifier si statsResponse.data est un objet valide
+    if (statsResponse.data && typeof statsResponse.data === 'object' && !Array.isArray(statsResponse.data)) {
+      totalLieux.value = statsResponse.data.totalLieux || 0
+      lieuxEnAttente.value = statsResponse.data.lieuxEnAttente || 0
+      lieuxValides.value = statsResponse.data.lieuxValides || 0
+    } else {
+      console.error('Réponse stats inattendue:', statsResponse.data)
+      totalLieux.value = 0
+      lieuxEnAttente.value = 0
+      lieuxValides.value = 0
+    }
+
   } catch (error) {
     console.error('Erreur lors du chargement des données:', error)
   }
