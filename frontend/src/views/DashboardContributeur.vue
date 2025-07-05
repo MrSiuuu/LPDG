@@ -189,8 +189,8 @@ const loadData = async () => {
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
     const [lieuxResponse, statsResponse] = await Promise.all([
-      axios.get('/api/lieux/user/lieux', { headers }),
-      axios.get('/api/lieux/user/stats', { headers })
+      axios.get(`${import.meta.env.VITE_API_URL}/api/lieux/user/lieux`, { headers }),
+      axios.get(`${import.meta.env.VITE_API_URL}/api/lieux/user/stats`, { headers })
     ])
 
     if (Array.isArray(lieuxResponse.data)) {
@@ -232,9 +232,9 @@ const submitLieu = async (formData) => {
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
     if (editingLieu.value) {
-      await axios.put(`/api/lieux/${editingLieu.value.id}`, formData, { headers })
+      await axios.put(`${import.meta.env.VITE_API_URL}/api/lieux/${editingLieu.value.id}`, formData, { headers })
     } else {
-      await axios.post('/api/lieux', formData, { headers })
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/lieux`, formData, { headers })
     }
 
     // Réinitialiser et retourner au tableau de bord
@@ -261,7 +261,7 @@ const deleteLieu = async (lieu) => {
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
 
-    await axios.delete(`/api/lieux/${lieu.id}`, { headers })
+    await axios.delete(`${import.meta.env.VITE_API_URL}/api/lieux/${lieu.id}`, { headers })
     loadData()
   } catch (error) {
     console.error('Erreur lors de la suppression du lieu:', error)
