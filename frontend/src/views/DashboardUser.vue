@@ -271,7 +271,7 @@ const fetchLikedLieux = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const { data } = await axios.get('/api/lieux/user/likes', { headers })
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/lieux/user/likes`, { headers })
     console.log('LIKED LIEUX DATA:', data)
     likedLieux.value = data || []
   } catch (error) {
@@ -288,7 +288,7 @@ const fetchVisitedLieux = async () => {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
-    const { data } = await axios.get('/api/lieux/user/visited', { headers })
+    const { data } = await axios.get(`${import.meta.env.VITE_API_URL}/api/lieux/user/visited`, { headers })
     console.log('VISITED LIEUX DATA:', data)
     visitedLieux.value = data || []
   } catch (error) {
@@ -305,7 +305,7 @@ const unlikeLieu = async (lieuId) => {
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
     
-    await axios.post(`/api/lieux/${lieuId}/like`, {}, { headers })
+    await axios.post(`${import.meta.env.VITE_API_URL}/api/lieux/${lieuId}/like`, {}, { headers })
     
     // Retirer le lieu de la liste locale
     likedLieux.value = likedLieux.value.filter(lieu => lieu.id !== lieuId)
