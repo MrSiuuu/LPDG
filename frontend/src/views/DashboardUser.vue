@@ -264,8 +264,10 @@ const fetchLikedLieux = async () => {
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
     const { data } = await axios.get('/api/lieux/user/likes', { headers })
+    console.log('LIKED LIEUX DATA:', data)
     likedLieux.value = data || []
   } catch (error) {
+    console.error('Erreur fetchLikedLieux:', error)
     likedLieux.value = []
   } finally {
     loadingLikedLieux.value = false
@@ -279,8 +281,10 @@ const fetchVisitedLieux = async () => {
     const token = sessionData?.session?.access_token
     const headers = token ? { Authorization: `Bearer ${token}` } : {}
     const { data } = await axios.get('/api/lieux/user/visited', { headers })
+    console.log('VISITED LIEUX DATA:', data)
     visitedLieux.value = data || []
   } catch (error) {
+    console.error('Erreur fetchVisitedLieux:', error)
     visitedLieux.value = []
   } finally {
     loadingVisitedLieux.value = false
