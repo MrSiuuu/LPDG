@@ -1,29 +1,29 @@
 <template>
-  <div class="bg-white shadow rounded-lg p-6">
+  <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
     <div class="mb-6">
-      <h2 class="text-2xl font-bold text-gray-900">
+      <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
         {{ editingLieu ? 'Modifier le lieu' : 'Ajouter un nouveau lieu' }}
       </h2>
-      <p class="text-gray-600 mt-2">
+      <p class="text-gray-600 dark:text-gray-300 mt-2">
         {{ editingLieu ? 'Modifiez les informations du lieu' : 'Remplissez les informations pour ajouter un nouveau lieu' }}
       </p>
     </div>
 
     <form @submit.prevent="submitForm" class="space-y-8">
       <!-- Section Informations de base -->
-      <div class="border-b border-gray-200 pb-6">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4">Informations de base</h3>
+      <div class="border-b border-gray-200 dark:border-gray-700 pb-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">Informations de base</h3>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Colonne gauche -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Nom du lieu *</label>
-              <input v-model="form.nom" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Nom du lieu *</label>
+              <input v-model="form.nom" type="text" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Type *</label>
-              <select v-model="form.type" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Type *</label>
+              <select v-model="form.type" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                 <option value="">Sélectionner un type</option>
                 <option value="restaurant">Restaurant</option>
                 <option value="hotel">Hôtel</option>
@@ -36,24 +36,24 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Ville *</label>
-              <input v-model="form.ville" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Ville *</label>
+              <input v-model="form.ville" type="text" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Adresse *</label>
-              <input v-model="form.adresse" type="text" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Adresse *</label>
+              <input v-model="form.adresse" type="text" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Prix approximatif (€)</label>
-              <input v-model="form.prix" type="number" step="0.01" min="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Prix approximatif (€)</label>
+              <input v-model="form.prix" type="number" step="0.01" min="0" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
             </div>
 
             <!-- Coordonnées -->
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="latitude" class="block text-sm font-medium text-gray-700">
+                <label for="latitude" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Latitude
                 </label>
                 <input
@@ -61,12 +61,12 @@
                   step="any"
                   id="latitude"
                   v-model="form.latitude"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                   placeholder="14.7167"
                 />
               </div>
               <div>
-                <label for="longitude" class="block text-sm font-medium text-gray-700">
+                <label for="longitude" class="block text-sm font-medium text-gray-700 dark:text-gray-200">
                   Longitude
                 </label>
                 <input
@@ -74,7 +74,7 @@
                   step="any"
                   id="longitude"
                   v-model="form.longitude"
-                  class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"
                   placeholder="-17.4677"
                 />
               </div>
@@ -86,9 +86,9 @@
                 id="accessible"
                 v-model="form.accessible_mobilite_reduite"
                 type="checkbox"
-                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded"
               />
-              <label for="accessible" class="ml-2 block text-sm text-gray-900">
+              <label for="accessible" class="ml-2 block text-sm text-gray-900 dark:text-white">
                 Accessible aux personnes à mobilité réduite
               </label>
             </div>
@@ -97,15 +97,15 @@
           <!-- Colonne droite -->
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700">Description *</label>
-              <textarea v-model="form.description" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Description *</label>
+              <QuillEditor v-model:content="form.description" theme="snow" class="mt-1 w-full min-h-[250px] bg-white dark:bg-gray-700" />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Image principale</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Image principale</label>
               <div class="mt-1 flex items-center space-x-4">
                 <input type="file" @change="handleMainImageUpload" accept="image/*" class="hidden" ref="mainImageInput">
-                <button type="button" @click="$refs.mainImageInput.click()" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="button" @click="$refs.mainImageInput.click()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-white bg-white dark:bg-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                   Choisir une image
                 </button>
                 <img v-if="mainImagePreview" :src="mainImagePreview" class="h-20 w-20 object-cover rounded-md">
@@ -113,10 +113,10 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Galerie d'images</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Galerie d'images</label>
               <div class="mt-1">
                 <input type="file" @change="handleGalleryUpload" accept="image/*" multiple class="hidden" ref="galleryInput">
-                <button type="button" @click="$refs.galleryInput.click()" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="button" @click="$refs.galleryInput.click()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-white bg-white dark:bg-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                   Ajouter des images
                 </button>
                 <div class="mt-2 grid grid-cols-4 gap-2">
@@ -230,11 +230,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Titre de l'événement</label>
-                <input v-model="evenement.titre" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="evenement.titre" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Type d'événement</label>
-                <select v-model="evenement.type_evenement" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <select v-model="evenement.type_evenement" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                   <option value="general">Général</option>
                   <option value="culturel">Culturel</option>
                   <option value="musical">Musical</option>
@@ -246,23 +246,23 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Date de début</label>
-                <input v-model="evenement.date_debut" type="datetime-local" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="evenement.date_debut" type="datetime-local" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Date de fin</label>
-                <input v-model="evenement.date_fin" type="datetime-local" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="evenement.date_fin" type="datetime-local" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Prix (€)</label>
-                <input v-model="evenement.prix_evenement" type="number" step="0.01" min="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="evenement.prix_evenement" type="number" step="0.01" min="0" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Capacité maximale</label>
-                <input v-model="evenement.capacite_max" type="number" min="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="evenement.capacite_max" type="number" min="1" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea v-model="evenement.description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                <textarea v-model="evenement.description" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"></textarea>
               </div>
             </div>
             <button type="button" @click="removeEvenement(index)" class="mt-3 text-red-600 hover:text-red-800 text-sm">
@@ -288,23 +288,23 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Nom du contact</label>
-                <input v-model="contact.nom_contact" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="contact.nom_contact" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Fonction</label>
-                <input v-model="contact.fonction" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="contact.fonction" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Téléphone (format guinéen)</label>
-                <input v-model="contact.telephone" type="tel" placeholder="+224 XXX XXX XXX" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="contact.telephone" type="tel" placeholder="+224 XXX XXX XXX" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Email</label>
-                <input v-model="contact.email" type="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="contact.email" type="email" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Type de contact</label>
-                <select v-model="contact.type_contact" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <select v-model="contact.type_contact" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                   <option value="referent">Référent principal</option>
                   <option value="reservation">Réservation</option>
                   <option value="commercial">Commercial</option>
@@ -325,7 +325,7 @@
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Notes</label>
-                <textarea v-model="contact.notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                <textarea v-model="contact.notes" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"></textarea>
               </div>
             </div>
             <button type="button" @click="removeContact(index)" class="mt-3 text-red-600 hover:text-red-800 text-sm">
@@ -346,15 +346,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700">Nom de la ressource</label>
-                <input v-model="ressource.nom" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input v-model="ressource.nom" type="text" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Fichier</label>
-                <input type="file" @change="handleRessourceUpload($event, index)" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                <input type="file" @change="handleRessourceUpload($event, index)" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Description</label>
-                <textarea v-model="ressource.description" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                <textarea v-model="ressource.description" rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400"></textarea>
               </div>
             </div>
             <button type="button" @click="removeRessource(index)" class="mt-3 text-red-600 hover:text-red-800 text-sm">
@@ -398,6 +398,8 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { supabase } from '../supabase'
+import { QuillEditor } from '@vueup/vue-quill'
+import Quill from 'quill'
 
 const props = defineProps({
   editingLieu: {
@@ -480,8 +482,20 @@ const resetForm = () => {
 // Réinitialiser le formulaire quand on change de lieu à éditer
 watch(() => props.editingLieu, (newValue) => {
   if (newValue) {
-    form.value = { 
+    let description = newValue.description || ''
+    try {
+      // Si c'est du JSON (Delta), on parse
+      const delta = typeof description === 'string' ? JSON.parse(description) : description
+      if (delta && delta.ops) {
+        description = delta
+      }
+    } catch (e) {
+      // Si ce n'est pas du JSON, on suppose que c'est du texte brut
+      description = { ops: [{ insert: description }] }
+    }
+    form.value = {
       ...newValue,
+      description,
       accessible_mobilite_reduite: newValue.accessible_mobilite_reduite || false,
       reseaux_sociaux: newValue.reseaux_sociaux || {
         facebook: '',
@@ -670,4 +684,28 @@ const cancel = () => {
   resetForm()
   emit('cancel')
 }
-</script> 
+</script>
+
+<style>
+/* Correction du popup de lien Quill pour le mode sombre et clair */
+.ql-tooltip {
+  background: #fff !important;
+  color: #222 !important;
+  border: 1px solid #e5e7eb !important;
+}
+.dark .ql-tooltip {
+  background: #222 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+.ql-tooltip input {
+  background: #fff !important;
+  color: #222 !important;
+  border: 1px solid #e5e7eb !important;
+}
+.dark .ql-tooltip input {
+  background: #222 !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+</style> 

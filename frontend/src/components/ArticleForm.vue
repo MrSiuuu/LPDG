@@ -70,8 +70,8 @@
         <!-- Colonne droite -->
         <div class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700">Contenu</label>
-            <RichTextEditor v-model="formData.contenu" />
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-200">Contenu *</label>
+            <textarea v-model="formData.contenu" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-400" rows="8" required></textarea>
           </div>
         </div>
       </div>
@@ -102,7 +102,6 @@
 import { ref, reactive, watch, onMounted } from 'vue'
 import axios from 'axios'
 import { supabase } from '../supabase'
-import RichTextEditor from './RichTextEditor.vue'
 import ImageUploader from './ImageUploader.vue'
 import ArticlePreview from './ArticlePreview.vue'
 import { useRouter } from 'vue-router'

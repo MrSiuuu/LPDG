@@ -26,13 +26,13 @@ const goToArticle = () => {
 <template>
   <div 
     @click="goToArticle"
-    class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+    class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 cursor-pointer dark:bg-gray-800"
   >
     <div class="p-6">
-      <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+      <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2 dark:text-gray-100">
         {{ article.title }}
       </h3>
-      <p class="text-gray-600 mb-4 line-clamp-3">
+      <p class="text-gray-600 mb-4 line-clamp-3 dark:text-gray-300">
         {{ shortDescription }}
       </p>
       <div class="flex items-center justify-between text-sm text-gray-500">
@@ -44,7 +44,7 @@ const goToArticle = () => {
             {{ new Date(article.created_at).toLocaleDateString('fr-FR') }}
           </span>
         </div>
-        <span class="text-indigo-600 hover:text-indigo-800">
+        <span class="text-indigo-600 hover:text-indigo-800 dark:text-gray-300">
           Lire l'article →
         </span>
       </div>

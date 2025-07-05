@@ -1,10 +1,10 @@
 <template>
-  <nav class="bg-white border-b border-gray-200 fixed w-full z-20 top-0 left-0">
+  <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 fixed w-full z-20 top-0 left-0">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
       <!-- Titre à gauche -->
       <router-link to="/" class="flex items-center space-x-2">
         <img src="https://flowbite.com/docs/images/logo.svg" class="h-8" alt="Logo LPDG">
-        <span class="self-center text-2xl font-semibold whitespace-nowrap text-gray-900">LPDG</span>
+        <span class="self-center text-2xl font-semibold whitespace-nowrap text-gray-900 dark:text-white">LPDG</span>
       </router-link>
       <!-- Barre de recherche masquée car il y a déjà un filtre sur la page -->
       <!--
@@ -34,9 +34,21 @@
           <router-link to="/login" class="btn btn-ghost normal-case text-base text-gray-800 hidden md:inline-flex">Connexion</router-link>
           <router-link to="/register" class="btn btn-ghost normal-case text-base text-gray-800 hidden md:inline-flex">Inscription</router-link>
         </template>
+        <!-- Toggle dark mode desktop -->
+        <button
+          @click="toggleDark"
+          aria-label="Basculer le mode sombre"
+          class="w-16 h-8 items-center rounded-full transition-colors duration-300 focus:outline-none border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow hidden md:flex"
+        >
+          <span class="w-7 h-7 flex items-center justify-center rounded-full transition-all duration-300"
+                :class="isDark ? 'translate-x-8 bg-white' : 'translate-x-0 bg-white'">
+            <span v-if="!isDark" class="text-yellow-500 text-xl">&#9728;</span>
+            <span v-else class="text-yellow-400 text-xl">&#9789;</span>
+          </span>
+        </button>
         <!-- Bouton hamburger pour mobile -->
         <button @click="toggleMenu" class="md:hidden ml-2">
-          <svg class="w-6 h-6" fill="#000000" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <svg class="w-6 h-6" :class="hamburgerColor" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
           </svg>
         </button>
@@ -45,7 +57,22 @@
     
     <!-- Menu mobile -->
     <div v-if="showMenu" class="md:hidden">
-      <div class="px-2 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
+      <div class="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+        <!-- Toggle dark mode mobile -->
+        <div class="flex justify-center mb-3">
+          <button
+            @click="toggleDark"
+            aria-label="Basculer le mode sombre"
+            class="w-16 h-8 flex items-center rounded-full transition-colors duration-300 focus:outline-none border-2 border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 shadow"
+          >
+            <span class="w-7 h-7 flex items-center justify-center rounded-full transition-all duration-300"
+                  :class="isDark ? 'translate-x-8 bg-white' : 'translate-x-0 bg-white'">
+              <span v-if="!isDark" class="text-yellow-500 text-xl">&#9728;</span>
+              <span v-else class="text-yellow-400 text-xl">&#9789;</span>
+            </span>
+          </button>
+        </div>
+        
         <!-- Barre de recherche mobile masquée car il y a déjà un filtre sur la page -->
         <!--
         <form @submit.prevent="onSearch" class="px-3 py-2">
@@ -81,7 +108,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { supabase } from '../supabase'
 
 const router = useRouter()
@@ -89,6 +116,8 @@ const role = ref(localStorage.getItem('user_role'))
 const isAuthenticated = ref(!!role.value)
 const showMenu = ref(false)
 const searchQuery = ref('')
+const isDark = ref(false)
+const hamburgerColor = ref('text-gray-900')
 
 const emit = defineEmits(['search'])
 
@@ -131,6 +160,26 @@ const toggleMenu = () => {
   showMenu.value = !showMenu.value
 }
 
+function applyTheme(dark) {
+  const html = document.documentElement
+  if (dark) {
+    html.classList.add('dark')
+    localStorage.setItem('theme', 'dark')
+  } else {
+    html.classList.remove('dark')
+    localStorage.setItem('theme', 'light')
+  }
+  isDark.value = dark
+}
+
+function toggleDark() {
+  applyTheme(!isDark.value)
+}
+
+function updateHamburgerColor() {
+  hamburgerColor.value = document.documentElement.classList.contains('dark') ? 'text-white' : 'text-gray-900'
+}
+
 // Écouter les changements d'authentification Supabase
 onMounted(() => {
   supabase.auth.onAuthStateChange((event, session) => {
@@ -159,5 +208,11 @@ onMounted(() => {
       isAuthenticated.value = false
     }
   })
+
+  const saved = localStorage.getItem('theme')
+  applyTheme(saved === 'dark')
+  updateHamburgerColor()
+  const observer = new MutationObserver(updateHamburgerColor)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 })
 </script> 

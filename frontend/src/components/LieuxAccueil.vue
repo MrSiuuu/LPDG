@@ -2,7 +2,7 @@
   <div class="max-w-7xl mx-auto py-8 px-4">
     <!-- Header avec titre et bouton -->
     <div class="flex justify-between items-center mb-8">
-      <h2 class="text-3xl font-bold text-gray-800">Lieux touristiques</h2>
+      <h2 class="text-3xl font-bold text-gray-800 dark:text-gray-100">Lieux touristiques</h2>
       <router-link 
         to="/lieux" 
         class="bg-indigo-500 hover:bg-indigo-600 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
@@ -26,7 +26,7 @@
       <div
         v-for="lieu in lieuxFiltres"
         :key="lieu.id"
-        class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
       >
         <!-- Image avec badges -->
         <div class="relative">
@@ -63,8 +63,8 @@
           <!-- Titre et ville -->
           <div class="flex justify-between items-start mb-2">
             <div class="flex-1">
-              <h3 class="text-xl font-semibold text-gray-800 mb-1 line-clamp-1">{{ lieu.nom }}</h3>
-              <p class="text-sm text-gray-600 flex items-center">
+              <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-1 line-clamp-1">{{ lieu.nom }}</h3>
+              <p class="text-sm text-gray-600 dark:text-gray-300 flex items-center">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -76,8 +76,8 @@
           
           <!-- Prix -->
           <div v-if="lieu.prix" class="py-2">
-            <p class="text-lg font-bold text-green-600">{{ lieu.prix }} €</p>
-            <p class="text-sm text-gray-500">Prix approximatif</p>
+            <p class="text-lg font-bold text-green-600 dark:text-green-400">{{ lieu.prix }} GNF</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Prix approximatif</p>
           </div>
           
           <!-- Note moyenne -->
@@ -87,14 +87,14 @@
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
               </svg>
             </div>
-            <span class="text-gray-600 text-sm ml-2">({{ lieu.note_moyenne || 0 }}/5)</span>
+            <span class="text-gray-600 dark:text-gray-300 text-sm ml-2">({{ lieu.note_moyenne || 0 }}/5)</span>
           </div>
           
           <!-- Description -->
-          <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ lieu.description }}</p>
+          <p class="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">{{ resumeDescription(lieu.description) }}</p>
           
           <!-- Informations supplémentaires -->
-          <div class="flex items-center justify-between mb-4 text-xs text-gray-500">
+          <div class="flex items-center justify-between mb-4 text-xs text-gray-500 dark:text-gray-400">
             <div class="flex items-center">
               <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -119,8 +119,8 @@
             </router-link>
             <button 
               @click.stop="toggleVisite(lieu.id)"
-              class="bg-gray-200 text-gray-800 py-2 px-4 rounded-full font-semibold hover:bg-gray-300 transition-colors duration-200"
-              :class="{ 'bg-green-200 text-green-800': lieu.hasVisited }"
+              class="bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 py-2 px-4 rounded-full font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
+              :class="{ 'bg-green-200 dark:bg-green-700 text-green-800 dark:text-green-100': lieu.hasVisited }"
             >
               {{ lieu.hasVisited ? '✓ Visité' : 'Visiter' }}
             </button>
@@ -131,13 +131,13 @@
     
     <!-- Modal d'invitation à la connexion -->
     <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
         <div class="text-center">
-          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
             <span class="text-2xl">🔐</span>
           </div>
-          <h3 class="text-lg font-medium text-gray-900 mb-2">Connexion requise</h3>
-          <p class="text-sm text-gray-600 mb-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Connexion requise</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
             Connectez-vous pour interagir avec les lieux (likes, visites)
           </p>
           <div class="flex gap-3 justify-center">
@@ -155,7 +155,7 @@
             </button>
             <button 
               @click="showLoginModal = false" 
-              class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition-colors"
+              class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Annuler
             </button>
@@ -196,6 +196,28 @@ const lieuxFiltres = computed(() => {
     (lieu.adresse && lieu.adresse.toLowerCase().includes(q))
   )
 })
+
+function extractTextFromDescription(desc) {
+  if (!desc) return ''
+  try {
+    // Si c'est du JSON (Delta Quill)
+    const delta = JSON.parse(desc)
+    if (delta && delta.ops) {
+      return delta.ops.map(op => typeof op.insert === 'string' ? op.insert : '').join('')
+    }
+  } catch (e) {
+    // Sinon, c'est peut-être du HTML
+    const div = document.createElement('div')
+    div.innerHTML = desc
+    return div.textContent || div.innerText || ''
+  }
+  return desc
+}
+
+function resumeDescription(desc) {
+  const txt = extractTextFromDescription(desc).replace(/\s+/g, ' ').trim()
+  return txt.length > 90 ? txt.substring(0, 90) + '...' : txt
+}
 
 // Fonction pour récupérer les lieux avec les données enrichies
 async function fetchLieux() {

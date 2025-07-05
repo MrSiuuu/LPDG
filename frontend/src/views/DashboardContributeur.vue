@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <aside class="w-64 bg-indigo-900 text-white flex flex-col py-8 px-4">
       <div class="mb-10 flex items-center justify-center">
-        <span class="text-xl font-bold">Contributeur</span>
+        <span class="text-xl font-bold dark:text-white">Contributeur</span>
       </div>
       <nav class="flex-1 space-y-2">
         <button
@@ -24,8 +24,8 @@
 
     <!-- Main Content -->
     <main class="flex-1 p-6 mt-5">
-      <div v-if="profile.prenom || profile.nom" class="text-2xl font-semibold text-gray-800 mt-5">Bonjour {{ profile.prenom || profile.nom }} !</div>
-      <h1 class="text-3xl font-bold mb-6 text-gray-800">Tableau de bord</h1>
+      <div v-if="profile.prenom || profile.nom" class="text-2xl font-semibold text-gray-900 mt-12">Bonjour {{ profile.prenom || profile.nom }} !</div>
+      <h1 class="text-3xl font-bold mb-6 text-gray-900">Tableau de bord</h1>
 
       <!-- En-tête avec photo de profil et bouton d'édition -->
       <div class="bg-white shadow rounded-lg mb-6">
@@ -36,10 +36,10 @@
                 {{ getInitiales(profile.nom) }}
               </div>
               <div class="ml-4">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
                   {{ profile.nom }}
                 </h3>
-                <p class="text-sm text-gray-500">{{ profile.email }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-300">{{ profile.email }}</p>
               </div>
             </div>
           </div>
@@ -65,7 +65,7 @@
 
         <!-- Actions Rapides -->
         <div class="mt-10">
-          <h2 class="text-xl font-semibold text-gray-700 mb-4">Actions rapides</h2>
+          <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-4">Actions rapides</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <button @click="setTab('ajouter')" class="border-2 border-indigo-300 rounded-lg p-6 text-center hover:bg-indigo-50">
               <div class="text-lg font-medium text-indigo-700">+ Ajouter un lieu</div>
@@ -78,7 +78,7 @@
       </div>
 
       <div v-else-if="activeTab === 'lieux'">
-        <h2 class="text-xl font-semibold text-gray-700 mb-4">Mes lieux récents</h2>
+        <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-4">Mes lieux récents</h2>
         <div v-if="lieuxRecents.length">
           <div class="overflow-x-auto">
             <table class="min-w-full bg-white shadow rounded">
@@ -110,7 +110,7 @@
           </div>
         </div>
         <div v-else>
-          <p class="text-gray-500">Aucun lieu ajouté pour le moment.</p>
+          <p class="text-gray-500 dark:text-gray-300">Aucun lieu ajouté pour le moment.</p>
         </div>
         <button @click="setTab('dashboard')" class="mt-6 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Retour au tableau de bord</button>
       </div>

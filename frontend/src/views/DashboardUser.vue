@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-gray-100 md:flex-row pt-12 md:pt-16">
+  <div class="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 md:flex-row pt-12 md:pt-16">
     <!-- Sidebar Desktop -->
-    <aside class="w-64 bg-gray-900 text-gray-100 flex-col py-8 px-4 hidden md:flex">
+    <aside class="w-64 bg-gray-900 dark:bg-gray-800 text-gray-100 flex-col py-8 px-4 hidden md:flex">
       <div class="mb-10 flex items-center justify-center">
         <span class="text-2xl font-bold tracking-wide">Espace Utilisateur</span>
       </div>
@@ -10,29 +10,29 @@
           v-for="item in navItems"
           :key="item.tab"
           @click="setTab(item.tab)"
-          class="flex items-center w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-800 hover:translate-x-1"
+          class="flex items-center w-full text-left px-4 py-3 rounded-xl transition-all duration-300 hover:bg-gray-800 dark:hover:bg-gray-700 hover:translate-x-1"
           :class="{
-            'bg-gray-800 text-indigo-400 font-semibold': activeTab === item.tab,
-            'text-gray-300': activeTab !== item.tab
+            'bg-gray-800 dark:bg-gray-700 text-indigo-400 font-semibold': activeTab === item.tab,
+            'text-gray-300 dark:text-gray-400': activeTab !== item.tab
           }"
         >
           <span class="mr-3 text-xl">{{ item.icon }}</span>
           {{ item.label }}
         </button>
       </nav>
-      <button @click="logout" class="mt-10 px-4 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all duration-300 w-full shadow-lg hover:shadow-xl">
+      <button @click="logout" class="mt-10 px-4 py-3 bg-indigo-600 dark:bg-indigo-700 text-white rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-800 transition-all duration-300 w-full shadow-lg hover:shadow-xl">
         🔐 Déconnexion
       </button>
     </aside>
 
     <!-- Main content -->
-    <main class="flex-1 p-4 md:p-10 bg-gray-50 pb-24 md:pb-10">
+    <main class="flex-1 p-4 md:p-10 bg-gray-50 dark:bg-gray-900 pb-24 md:pb-10">
       <div class="max-w-7xl mx-auto py-4 md:py-6 px-2 sm:px-6 lg:px-8">
         <!-- Onglet Dashboard -->
         <div v-show="activeTab === 'dashboard'">
-          <div v-if="profile.prenom || profile.nom" class="text-2xl font-semibold text-gray-800 mb-2">Bonjour {{ profile.prenom || profile.nom }} !</div>
-          <h1 class="text-3xl font-bold mb-6 text-gray-900">Bienvenue sur votre espace</h1>
-          <div class="bg-white shadow rounded-lg mb-6">
+          <div v-if="profile.prenom || profile.nom" class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-2">Bonjour {{ profile.prenom || profile.nom }} !</div>
+          <h1 class="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Bienvenue sur votre espace</h1>
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
             <div class="px-4 py-5 sm:px-6">
               <div class="flex items-center">
                 <UserAvatar 
@@ -41,18 +41,18 @@
                   size="lg"
                 />
                 <div class="ml-4">
-                  <h3 class="text-lg leading-6 font-medium text-gray-900">
+                  <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                     {{ profile.nom }}
                   </h3>
-                  <p class="text-sm text-gray-500">{{ profile.email }}</p>
+                  <p class="text-sm text-gray-500 dark:text-gray-300">{{ profile.email }}</p>
                 </div>
               </div>
             </div>
           </div>
           
-          <div class="bg-white shadow rounded-lg">
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
             <div class="px-4 py-5 sm:p-6">
-              <h2 class="text-lg font-medium text-gray-900">Tableau de bord</h2>
+              <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Tableau de bord</h2>
               <!-- Ajoutez ici le contenu spécifique du dashboard -->
             </div>
           </div>
@@ -60,12 +60,12 @@
 
         <!-- Onglet Accueil du site -->
         <div v-show="activeTab === 'accueil'">
-          <h2 class="text-2xl font-bold mb-6 text-gray-900">Retour à l'accueil</h2>
-          <div class="bg-white shadow rounded-lg p-6">
-            <p class="text-gray-600 mb-4">Vous allez quitter votre espace personnel pour retourner à l'accueil du site.</p>
+          <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Retour à l'accueil</h2>
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <p class="text-gray-600 dark:text-gray-300 mb-4">Vous allez quitter votre espace personnel pour retourner à l'accueil du site.</p>
             <router-link 
               to="/" 
-              class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 shadow-sm hover:shadow-md"
+              class="inline-flex items-center px-6 py-3 bg-indigo-600 dark:bg-indigo-700 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 transition-colors duration-200 shadow-sm hover:shadow-md"
             >
               <span class="mr-2">🏠</span>
               Aller à l'accueil du site
@@ -75,16 +75,16 @@
 
         <!-- Onglet Favoris & Visites -->
         <div v-show="activeTab === 'favoris'">
-          <h2 class="text-2xl font-bold mb-6 text-gray-900">Mes lieux favoris & visités</h2>
+          <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Mes lieux favoris & visités</h2>
           <!-- Lieux likés -->
           <div class="mb-8">
-            <h3 class="text-lg font-semibold text-indigo-700 mb-2">Lieux likés</h3>
+            <h3 class="text-lg font-semibold text-indigo-700 dark:text-indigo-400 mb-2">Lieux likés</h3>
             <div v-if="loadingLikedLieux" class="text-center py-4">
-              <p class="text-gray-500">Chargement de vos lieux favoris...</p>
+              <p class="text-gray-500 dark:text-gray-300">Chargement de vos lieux favoris...</p>
             </div>
             <div v-else-if="likedLieux.length === 0" class="text-center py-8">
-              <p class="text-gray-500">Vous n'avez pas encore liké de lieux.</p>
-              <router-link to="/" class="text-indigo-600 hover:text-indigo-800 mt-2 inline-block">
+              <p class="text-gray-500 dark:text-gray-300">Vous n'avez pas encore liké de lieux.</p>
+              <router-link to="/" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 mt-2 inline-block">
                 Découvrir des lieux
               </router-link>
             </div>
@@ -92,14 +92,14 @@
               <div 
                 v-for="lieu in likedLieux" 
                 :key="'like-' + lieu.id" 
-                class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
               >
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
-                    <h3 class="font-semibold text-gray-900">{{ lieu.nom }}</h3>
-                    <p class="text-sm text-gray-600">{{ lieu.ville }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ lieu.type }}</p>
-                    <p v-if="lieu.prix" class="text-sm text-indigo-600 font-medium mt-1">
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ lieu.nom }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ lieu.ville }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ lieu.type }}</p>
+                    <p v-if="lieu.prix" class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-1">
                       {{ lieu.prix }}€
                     </p>
                   </div>
@@ -121,7 +121,7 @@
                 <div class="mt-3">
                   <router-link 
                     :to="`/lieu/${lieu.id}`"
-                    class="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                    class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium"
                   >
                     Voir les détails →
                   </router-link>
@@ -131,13 +131,13 @@
           </div>
           <!-- Lieux visités -->
           <div>
-            <h3 class="text-lg font-semibold text-green-700 mb-2">Lieux visités</h3>
+            <h3 class="text-lg font-semibold text-green-700 dark:text-green-400 mb-2">Lieux visités</h3>
             <div v-if="loadingVisitedLieux" class="text-center py-4">
-              <p class="text-gray-500">Chargement de vos lieux visités...</p>
+              <p class="text-gray-500 dark:text-gray-300">Chargement de vos lieux visités...</p>
             </div>
             <div v-else-if="visitedLieux.length === 0" class="text-center py-8">
-              <p class="text-gray-500">Vous n'avez pas encore visité de lieux.</p>
-              <router-link to="/" class="text-green-600 hover:text-green-800 mt-2 inline-block">
+              <p class="text-gray-500 dark:text-gray-300">Vous n'avez pas encore visité de lieux.</p>
+              <router-link to="/" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 mt-2 inline-block">
                 Explorer des lieux
               </router-link>
             </div>
@@ -145,18 +145,18 @@
               <div 
                 v-for="lieu in visitedLieux" 
                 :key="'visited-' + lieu.id" 
-                class="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow"
               >
                 <div class="flex items-start justify-between">
                   <div class="flex-1">
-                    <h3 class="font-semibold text-gray-900">{{ lieu.nom }}</h3>
-                    <p class="text-sm text-gray-600">{{ lieu.ville }}</p>
-                    <p class="text-xs text-gray-500 mt-1">{{ lieu.type }}</p>
-                    <p v-if="lieu.prix" class="text-sm text-indigo-600 font-medium mt-1">
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100">{{ lieu.nom }}</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-300">{{ lieu.ville }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ lieu.type }}</p>
+                    <p v-if="lieu.prix" class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-1">
                       {{ lieu.prix }}€
                     </p>
                   </div>
-                  <span class="text-green-600 ml-2 font-bold" title="Déjà visité">✅</span>
+                  <span class="text-green-600 dark:text-green-400 ml-2 font-bold" title="Déjà visité">✅</span>
                 </div>
                 <div v-if="lieu.image_principale" class="mt-3">
                   <img 
@@ -168,7 +168,7 @@
                 <div class="mt-3">
                   <router-link 
                     :to="`/lieu/${lieu.id}`"
-                    class="text-green-600 hover:text-green-800 text-sm font-medium"
+                    class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300 text-sm font-medium"
                   >
                     Voir les détails →
                   </router-link>
@@ -180,28 +180,27 @@
 
         <!-- Onglet Profil -->
         <div v-show="activeTab === 'profil'">
-          <h2 class="text-2xl font-bold mb-6 text-gray-900">Mon profil</h2>
-          <ProfileEdit :profile="profile" @update="handleProfileUpdate" />
-          <div v-if="successMessage" class="text-green-600 text-center mt-4 font-semibold">{{ successMessage }}</div>
+          <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Mon profil</h2>
+          <div v-if="Object.keys(profile).length === 0" class="text-center py-8">
+            <p class="text-gray-500 dark:text-gray-300">Chargement du profil...</p>
+          </div>
+          <ProfileEdit v-else :profile="profile" @update="handleProfileUpdate" />
+          <div v-if="successMessage" class="text-green-600 dark:text-green-400 text-center mt-4 font-semibold">{{ successMessage }}</div>
         </div>
       </div>
     </main>
 
     <!-- Barre d'onglets mobile en bas -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around md:hidden z-50">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 flex justify-around md:hidden z-50">
       <button 
         v-for="item in navItems" 
         :key="item.tab" 
         @click="setTab(item.tab)" 
         class="flex flex-col items-center py-2 flex-1" 
-        :class="activeTab === item.tab ? 'text-indigo-600' : 'text-gray-400'"
+        :class="activeTab === item.tab ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-300'"
       >
         <span class="text-xl mb-1">{{ item.icon }}</span>
         <span class="text-xs">{{ item.label }}</span>
-      </button>
-      <button @click="logout" class="flex flex-col items-center py-2 flex-1 text-red-500">
-        <span class="text-xl mb-1">🔐</span>
-        <span class="text-xs">Déconnexion</span>
       </button>
     </nav>
   </div>

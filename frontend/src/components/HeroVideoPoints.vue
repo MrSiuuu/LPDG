@@ -1,8 +1,8 @@
 <template>
-  <section class="w-full py-12 px-2 md:px-8 flex flex-col lg:flex-row items-center justify-center gap-8">
+  <section class="w-full py-12 px-2 md:px-8 flex flex-col lg:flex-row items-center justify-center gap-8 bg-white dark:bg-gray-900">
     <!-- Vidéo à gauche -->
     <div class="w-full lg:w-1/2 flex justify-center">
-      <div class="rounded-3xl overflow-hidden shadow-lg w-full max-w-xl aspect-video bg-black">
+      <div class="rounded-3xl overflow-hidden shadow-lg w-full max-w-xl aspect-video bg-black dark:bg-gray-800">
         <iframe
           class="w-full h-full"
           src="https://www.youtube.com/embed/ScMzIvxBSi4"
@@ -19,8 +19,8 @@
         <div class="bg-indigo-900 text-white rounded-xl p-4 mb-4 flex items-center justify-center shadow-lg">
           <span v-html="point.icon" class="w-8 h-8"></span>
         </div>
-        <h3 class="text-xl font-bold text-indigo-900 mb-2">{{ point.title }}</h3>
-        <p class="text-gray-600">{{ point.desc }}</p>
+        <h3 class="text-xl font-bold text-indigo-900 dark:text-indigo-300 mb-2">{{ point.title }}</h3>
+        <p class="text-gray-600 dark:text-gray-200">{{ point.desc }}</p>
       </div>
     </div>
   </section>
@@ -53,8 +53,12 @@ const points = [
 
 <style scoped>
 section {
-  background: white;
+  /* background: white; */
   border-radius: 2rem;
   box-shadow: 0 4px 24px 0 rgba(0,0,0,0.07);
+}
+
+.dark section {
+  background: #111827;
 }
 </style> 

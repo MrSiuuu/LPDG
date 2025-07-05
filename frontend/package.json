@@ -15,13 +15,7 @@
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
     "@supabase/supabase-js": "^2.49.5",
-    "@tiptap/extension-image": "^2.12.0",
-    "@tiptap/extension-link": "^2.12.0",
-    "@tiptap/extension-placeholder": "^2.12.0",
-    "@tiptap/extension-text-align": "^2.12.0",
-    "@tiptap/extension-underline": "^2.12.0",
-    "@tiptap/starter-kit": "^2.12.0",
-    "@tiptap/vue-3": "^2.12.0",
+    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
     "daisyui": "^5.0.37",
@@ -29,6 +23,7 @@
     "echarts": "^5.6.0",
     "express": "^5.1.0",
     "pinia": "^3.0.1",
+    "quill": "^2.0.3",
     "vue": "^3.5.13",
     "vue-echarts": "^7.0.3",
     "vue-router": "^4.5.0"

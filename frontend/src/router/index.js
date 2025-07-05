@@ -124,6 +124,11 @@ const router = createRouter({
       path: '/legal/mentions',
       name: 'legal',
       component: () => import('@/views/LegalView.vue')
+    },
+    {
+      path: '/static-lieu-design',
+      name: 'static-lieu-design',
+      component: () => import('@/views/StaticLieuDesign.vue')
     }
   ]
 })

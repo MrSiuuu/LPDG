@@ -4,6 +4,7 @@ import * as echarts from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
 import { MapChart } from 'echarts/charts'
 import { TooltipComponent, LegendComponent, TitleComponent, VisualMapComponent } from 'echarts/components'
+import 'quill/dist/quill.snow.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
