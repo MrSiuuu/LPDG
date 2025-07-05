@@ -207,7 +207,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabase'
 import axios from 'axios'
@@ -237,6 +237,14 @@ function setTab(tab) {
     fetchVisitedLieux()
   }
 }
+
+// Watcher pour déclencher les fetchs même lors du chargement initial
+watch(activeTab, (tab) => {
+  if (tab === 'favoris') {
+    fetchLikedLieux()
+    fetchVisitedLieux()
+  }
+}, { immediate: true })
 
 const fetchProfile = async () => {
   try {
