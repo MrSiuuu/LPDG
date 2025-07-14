@@ -522,20 +522,50 @@ watch(() => props.editingLieu, (newValue) => {
 }, { immediate: true })
 
 // Fonctions pour les images
+const validateImageFile = (file) => {
+  const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
+  const maxSize = 5 * 1024 * 1024 // 5MB
+  
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(`Type de fichier non supporté: ${file.type}. Types supportés: JPEG, PNG, GIF, WebP`)
+  }
+  
+  if (file.size > maxSize) {
+    throw new Error(`Fichier trop volumineux: ${(file.size / 1024 / 1024).toFixed(2)}MB. Taille maximale: 5MB`)
+  }
+  
+  return true
+}
+
 const handleMainImageUpload = (event) => {
   const file = event.target.files[0]
   if (file) {
-    mainImageFile.value = file
-    mainImagePreview.value = URL.createObjectURL(file)
+    try {
+      validateImageFile(file)
+      mainImageFile.value = file
+      mainImagePreview.value = URL.createObjectURL(file)
+    } catch (error) {
+      alert(error.message)
+      event.target.value = '' // Reset input
+    }
   }
 }
 
 const handleGalleryUpload = (event) => {
   const files = Array.from(event.target.files)
-  galleryFiles.value.push(...files)
+  const validFiles = []
+  
   files.forEach(file => {
-    galleryPreviews.value.push(URL.createObjectURL(file))
+    try {
+      validateImageFile(file)
+      validFiles.push(file)
+      galleryPreviews.value.push(URL.createObjectURL(file))
+    } catch (error) {
+      alert(`Fichier "${file.name}": ${error.message}`)
+    }
   })
+  
+  galleryFiles.value.push(...validFiles)
 }
 
 const removeGalleryImage = (index) => {
@@ -629,23 +659,42 @@ const uploadImages = async () => {
 
   // Upload image principale
   if (mainImageFile.value) {
-    const fileExt = mainImageFile.value.name.split('.').pop()
-    const fileName = `lieux/${Date.now()}_main.${fileExt}`
-    const { data, error } = await supabase.storage.from('images').upload(fileName, mainImageFile.value)
-    if (!error) {
+    try {
+      const fileExt = mainImageFile.value.name.split('.').pop().toLowerCase()
+      const timestamp = Date.now()
+      const fileName = `lieux/${timestamp}_main.${fileExt}`
+      const { data, error } = await supabase.storage.from('images').upload(fileName, mainImageFile.value)
+      if (error) {
+        console.error('Erreur upload image principale:', error)
+        throw new Error(`Erreur upload image principale: ${error.message}`)
+      }
       const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(fileName)
       form.value.image_principale = publicUrlData.publicUrl
+    } catch (error) {
+      console.error('Erreur upload image principale:', error)
+      throw error
     }
   }
 
   // Upload images de la galerie
-  for (const file of galleryFiles.value) {
-    const fileExt = file.name.split('.').pop()
-    const fileName = `lieux/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
-    const { data, error } = await supabase.storage.from('images').upload(fileName, file)
-    if (!error) {
+  for (let i = 0; i < galleryFiles.value.length; i++) {
+    try {
+      const file = galleryFiles.value[i]
+      const fileExt = file.name.split('.').pop().toLowerCase()
+      const timestamp = Date.now()
+      const randomId = Math.random().toString(36).substring(2, 8)
+      const fileName = `lieux/${timestamp}_${randomId}_${i}.${fileExt}`
+      
+      const { data, error } = await supabase.storage.from('images').upload(fileName, file)
+      if (error) {
+        console.error(`Erreur upload image galerie ${i}:`, error)
+        throw new Error(`Erreur upload image galerie ${i}: ${error.message}`)
+      }
       const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(fileName)
       uploadedUrls.push(publicUrlData.publicUrl)
+    } catch (error) {
+      console.error(`Erreur upload image galerie ${i}:`, error)
+      throw error
     }
   }
 
@@ -656,12 +705,21 @@ const uploadRessources = async () => {
   for (let i = 0; i < ressourceFiles.value.length; i++) {
     const file = ressourceFiles.value[i]
     if (file) {
-      const fileExt = file.name.split('.').pop()
-      const fileName = `ressources/${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`
-      const { data, error } = await supabase.storage.from('images').upload(fileName, file)
-      if (!error) {
+      try {
+        const fileExt = file.name.split('.').pop().toLowerCase()
+        const timestamp = Date.now()
+        const randomId = Math.random().toString(36).substring(2, 8)
+        const fileName = `ressources/${timestamp}_${randomId}_${i}.${fileExt}`
+        const { data, error } = await supabase.storage.from('images').upload(fileName, file)
+        if (error) {
+          console.error(`Erreur upload ressource ${i}:`, error)
+          throw new Error(`Erreur upload ressource ${i}: ${error.message}`)
+        }
         const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(fileName)
         form.value.ressources[i].url = publicUrlData.publicUrl
+      } catch (error) {
+        console.error(`Erreur upload ressource ${i}:`, error)
+        throw error
       }
     }
   }
@@ -675,6 +733,8 @@ const submitForm = async () => {
     emit('submit', form.value)
   } catch (error) {
     console.error('Erreur lors de la soumission:', error)
+    // Afficher une notification d'erreur à l'utilisateur
+    alert(`Erreur lors de l'upload des fichiers: ${error.message}`)
   } finally {
     loading.value = false
   }

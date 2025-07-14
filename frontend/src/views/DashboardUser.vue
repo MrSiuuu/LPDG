@@ -100,7 +100,7 @@
                     <p class="text-sm text-gray-600 dark:text-gray-300">{{ lieu.ville }}</p>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ lieu.type }}</p>
                     <p v-if="lieu.prix" class="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-1">
-                      {{ lieu.prix }}€
+                      {{ lieu.prix }} GNF
                     </p>
                   </div>
                   <button 

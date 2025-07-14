@@ -1,6 +1,8 @@
 const { supabase } = require('../utils/supabaseClient');
 
 async function addLieu(lieuData, userId) {
+  // DEBUG : log du body reçu
+  console.log('BODY RECU addLieu:', JSON.stringify(lieuData, null, 2));
   // Extraire les données des entités liées
   const { videos, evenements, contacts, ...lieuInfo } = lieuData;
 
@@ -62,10 +64,32 @@ async function addLieu(lieuData, userId) {
     if (contactsError) throw contactsError;
   }
 
+  // DEBUG : log des images secondaires à insérer
+  console.log('Images secondaires à insérer dans photos_lieu:', lieuInfo.images);
+  // Ajouter les images secondaires dans photos_lieu
+  if (lieuInfo.images && Array.isArray(lieuInfo.images) && lieuInfo.images.length > 0) {
+    const photos = lieuInfo.images.map(url => ({
+      lieu_id: lieu.id,
+      user_id: userId,
+      url
+    }));
+    const { error: photosError } = await supabase
+      .from('photos_lieu')
+      .insert(photos);
+    if (photosError) {
+      console.error('Erreur insertion photos_lieu:', photosError);
+      throw photosError;
+    } else {
+      console.log('Insertion photos_lieu OK');
+    }
+  }
+
   return lieu;
 }
 
 async function updateLieu(lieuId, lieuData, userId) {
+  // DEBUG : log du body reçu
+  console.log('BODY RECU updateLieu:', JSON.stringify(lieuData, null, 2));
   // Extraire les données des entités liées
   const { videos, evenements, contacts, ...lieuInfo } = lieuData;
 
@@ -142,6 +166,34 @@ async function updateLieu(lieuId, lieuData, userId) {
         .insert(contactsWithLieuId);
       
       if (contactsError) throw contactsError;
+    }
+  }
+
+  // DEBUG : log des images secondaires à insérer
+  console.log('Images secondaires à mettre à jour dans photos_lieu:', lieuInfo.images);
+  // Mettre à jour les images secondaires dans photos_lieu
+  if (lieuInfo.images !== undefined) {
+    // Supprimer les anciennes images secondaires
+    await supabase
+      .from('photos_lieu')
+      .delete()
+      .eq('lieu_id', lieuId);
+    // Ajouter les nouvelles images secondaires
+    if (Array.isArray(lieuInfo.images) && lieuInfo.images.length > 0) {
+      const photos = lieuInfo.images.map(url => ({
+        lieu_id: lieuId,
+        user_id: userId,
+        url
+      }));
+      const { error: photosError } = await supabase
+        .from('photos_lieu')
+        .insert(photos);
+      if (photosError) {
+        console.error('Erreur insertion photos_lieu (update):', photosError);
+        throw photosError;
+      } else {
+        console.log('Update photos_lieu OK');
+      }
     }
   }
 
