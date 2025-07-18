@@ -12,6 +12,14 @@ const isAuthenticated = !!role
 
 const articles = ref([])
 const loading = ref(true)
+const typedText = ref('')
+const isTyping = ref(false)
+const currentStep = ref(0)
+
+const textSteps = [
+  'Bienvenue sur la plateforme qui réunit les passionnés de la Guinée : voyageurs curieux, locaux fiers de leur région, blogueurs engagés, ou simples amoureux du pays.',
+  'Découvre les plus beaux coins, les adresses incontournables, les traditions vivantes… et partage, toi aussi, ta vision de la Guinée. Ajoutez des lieux, partagez vos avis, écrivez des articles, ou gérez la communauté !'
+]
 
 const handleLogout = () => {
   localStorage.removeItem('user_role')
@@ -29,7 +37,43 @@ async function fetchArticles() {
   loading.value = false
 }
 
-onMounted(fetchArticles)
+// Animation de texte typewriter en plusieurs étapes
+const typeWriter = async () => {
+  // Première étape : afficher le premier texte
+  isTyping.value = true
+  typedText.value = ''
+  
+  for (let i = 0; i < textSteps[0].length; i++) {
+    typedText.value += textSteps[0][i]
+    await new Promise(resolve => setTimeout(resolve, 30))
+  }
+  
+  // Attendre 2 secondes
+  await new Promise(resolve => setTimeout(resolve, 2000))
+  
+  // Deuxième étape : faire disparaître le premier texte
+  for (let i = typedText.value.length; i > 0; i--) {
+    typedText.value = typedText.value.slice(0, -1)
+    await new Promise(resolve => setTimeout(resolve, 20))
+  }
+  
+  // Attendre 1 seconde
+  await new Promise(resolve => setTimeout(resolve, 1000))
+  
+  // Troisième étape : afficher le deuxième texte
+  for (let i = 0; i < textSteps[1].length; i++) {
+    typedText.value += textSteps[1][i]
+    await new Promise(resolve => setTimeout(resolve, 30))
+  }
+  
+  isTyping.value = false
+}
+
+onMounted(() => {
+  fetchArticles()
+  // Démarrer l'animation après un délai
+  setTimeout(typeWriter, 1000)
+})
 
 // --- DARK MODE ---
 const isDark = ref(false)
@@ -67,8 +111,7 @@ onMounted(() => {
             <span class="block text-indigo-600 dark:text-indigo-400">les lieux touristiques de Guinée</span>
           </h1>
           <p class="mt-3 max-w-md mx-auto text-base text-gray-500 dark:text-gray-300 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            Plateforme collaborative pour voyageurs, contributeurs, blogueurs et administrateurs.<br>
-            Ajoutez des lieux, partagez vos avis, écrivez des articles, ou gérez la communauté !
+            {{ typedText }}<span v-if="isTyping" class="animate-pulse">|</span>
           </p>
           <div class="mt-8 flex flex-col sm:flex-row justify-center gap-4">
             <router-link

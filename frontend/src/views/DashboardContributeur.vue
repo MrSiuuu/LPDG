@@ -70,6 +70,9 @@
             <button @click="setTab('ajouter')" class="border-2 border-indigo-300 rounded-lg p-6 text-center hover:bg-indigo-50">
               <div class="text-lg font-medium text-indigo-700">+ Ajouter un lieu</div>
             </button>
+            <button @click="setTab('ajouter_resto')" class="border-2 border-green-300 rounded-lg p-6 text-center hover:bg-green-50">
+              <div class="text-lg font-medium text-green-700">+ Ajouter un restaurant</div>
+            </button>
             <button @click="setTab('lieux')" class="border-2 border-indigo-300 rounded-lg p-6 text-center hover:bg-indigo-50">
               <div class="text-lg font-medium text-indigo-700">Voir mes lieux</div>
             </button>
@@ -123,6 +126,10 @@
         />
       </div>
 
+      <div v-else-if="activeTab === 'ajouter_resto'">
+        <RestaurantForm @submit="submitRestaurant" @cancel="cancelForm" />
+      </div>
+
       <div v-else-if="activeTab === 'profil'">
         <ProfileEdit :profile="profile" @update="handleProfileUpdate" />
       </div>
@@ -137,6 +144,7 @@ import { supabase } from '../supabase'
 import axios from 'axios'
 import LieuForm from '../components/LieuForm.vue'
 import ProfileEdit from './ProfileEdit.vue'
+import RestaurantForm from '../components/RestaurantForm.vue'
 
 const router = useRouter()
 const loading = ref(true)
@@ -294,6 +302,19 @@ const handleProfileUpdate = async (updatedProfile) => {
     profile.value = { ...profile.value, ...updatedProfile }
   } catch (error) {
     alert('Erreur lors de la mise à jour du profil : ' + error.message)
+  }
+}
+
+const submitRestaurant = async (result) => {
+  if (result.success) {
+    // Restaurant créé avec succès
+    console.log('Restaurant créé avec succès, ID:', result.lieuId)
+    // Recharger les données pour mettre à jour les statistiques
+    await loadData()
+    setTab('dashboard')
+  } else {
+    // Gérer les erreurs si nécessaire
+    console.error('Erreur lors de la création du restaurant:', result)
   }
 }
 

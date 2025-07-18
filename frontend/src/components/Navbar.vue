@@ -31,8 +31,8 @@
           <button @click="handleLogout" class="ml-4 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium hidden md:inline-block">Déconnexion</button>
         </template>
         <template v-else>
-          <router-link to="/login" class="btn btn-ghost normal-case text-base text-gray-800 hidden md:inline-flex">Connexion</router-link>
-          <router-link to="/register" class="btn btn-ghost normal-case text-base text-gray-800 hidden md:inline-flex">Inscription</router-link>
+          <router-link to="/login" class="btn btn-ghost normal-case text-base text-gray-800 dark:text-gray-200 hidden md:inline-flex">Connexion</router-link>
+          <router-link to="/register" class="btn btn-ghost normal-case text-base text-gray-800 dark:text-gray-200 hidden md:inline-flex">Inscription</router-link>
         </template>
         <!-- Toggle dark mode desktop -->
         <button
@@ -84,22 +84,22 @@
         <!-- Liens d'authentification mobile -->
         <template v-if="isAuthenticated">
           <template v-if="role === 'user'">
-            <router-link to="/dashboard-user" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Mon espace</router-link>
+            <router-link to="/dashboard-user" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 dark:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Mon espace</router-link>
           </template>
           <template v-else-if="role === 'contributor'">
-            <router-link to="/dashboard-contributeur" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Espace Contributeur</router-link>
+            <router-link to="/dashboard-contributeur" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 dark:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Espace Contributeur</router-link>
           </template>
           <template v-else-if="role === 'blogger'">
-            <router-link to="/dashboard-blogueur" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 hover:bg-gray-100 rounded-md">Espace Blogueur</router-link>
+            <router-link to="/dashboard-blogueur" @click="showMenu = false" class="block px-3 py-2 text-base text-indigo-700 dark:text-indigo-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Espace Blogueur</router-link>
           </template>
           <template v-else-if="role === 'admin'">
-            <router-link to="/adminlpdg" @click="showMenu = false" class="block px-3 py-2 text-base text-red-700 hover:bg-gray-100 rounded-md">Admin</router-link>
+            <router-link to="/adminlpdg" @click="showMenu = false" class="block px-3 py-2 text-base text-red-700 dark:text-red-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Admin</router-link>
           </template>
-          <button @click="handleLogout" class="block w-full text-left px-3 py-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md">Déconnexion</button>
+          <button @click="handleLogout" class="block w-full text-left px-3 py-2 text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Déconnexion</button>
         </template>
         <template v-else>
-          <router-link to="/login" @click="showMenu = false" class="block px-3 py-2 text-base text-gray-800 hover:bg-gray-100 rounded-md">Connexion</router-link>
-          <router-link to="/register" @click="showMenu = false" class="block px-3 py-2 text-base text-gray-800 hover:bg-gray-100 rounded-md">Inscription</router-link>
+          <router-link to="/login" @click="showMenu = false" class="block px-3 py-2 text-base text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Connexion</router-link>
+          <router-link to="/register" @click="showMenu = false" class="block px-3 py-2 text-base text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">Inscription</router-link>
         </template>
       </div>
     </div>

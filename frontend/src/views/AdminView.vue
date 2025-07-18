@@ -102,48 +102,78 @@
           <h2 class="text-2xl font-bold mb-6 text-gray-800">Liste des lieux</h2>
           <div v-if="lieuxLoading" class="text-gray-500">Chargement...</div>
           <div v-else>
-            <table class="min-w-full bg-white rounded shadow">
-              <thead>
+            <div class="overflow-x-auto">
+              <table class="min-w-full bg-white rounded-lg shadow-lg">
+                <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-4 py-2 text-left text-gray-700 font-bold">Nom</th>
-                  <th class="px-4 py-2 text-left text-gray-700 font-bold">Ville</th>
-                  <th class="px-4 py-2 text-left text-gray-700 font-bold">Type</th>
-                  <th class="px-4 py-2 text-left text-gray-700 font-bold">Description</th>
-                  <th class="px-4 py-2 text-left text-gray-700 font-bold">Statut</th>
-                  <th class="px-4 py-2 text-left text-gray-700 font-bold">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ville</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr v-for="lieu in lieux" :key="lieu.id" class="border-t">
-                  <td class="px-4 py-2 text-gray-800">{{ lieu.nom }}</td>
-                  <td class="px-4 py-2 text-gray-800">{{ lieu.ville }}</td>
-                  <td class="px-4 py-2 text-gray-800">{{ lieu.type }}</td>
-                  <td class="px-4 py-2 text-gray-800">{{ lieu.description }}</td>
-                  <td class="px-4 py-2 text-gray-800">
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="lieu in lieux" :key="lieu.id" class="hover:bg-gray-50 transition-colors duration-200">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">{{ lieu.nom }}</div>
+                      <div v-if="lieu.isRestaurant && lieu.restaurantInfo" class="text-xs text-gray-500 mt-1">
+                        <span v-if="lieu.restaurantInfo.type_cuisine" class="mr-2">
+                          🍽️ {{ lieu.restaurantInfo.type_cuisine }}
+                        </span>
+                        <span v-if="lieu.restaurantInfo.prix_moyen" class="text-indigo-600">
+                          💰 {{ lieu.restaurantInfo.prix_moyen }} GNF
+                        </span>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ lieu.ville }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span :class="{
+                        'inline-flex px-2 py-1 text-xs font-semibold rounded-full': true,
+                        'bg-red-100 text-red-800': lieu.isRestaurant,
+                        'bg-blue-100 text-blue-800': !lieu.isRestaurant
+                      }">
+                        {{ lieu.isRestaurant ? '🍽️ Restaurant' : lieu.type }}
+                      </span>
+                      <div v-if="lieu.isRestaurant && lieu.restaurantInfo?.services?.length" class="text-xs text-gray-500 mt-1">
+                        {{ lieu.restaurantInfo.services.join(', ') }}
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
                     <span :class="{
-                      'px-2 py-1 rounded text-sm': true,
+                        'inline-flex px-2 py-1 text-xs font-semibold rounded-full': true,
                       'bg-yellow-100 text-yellow-800': !lieu.est_valide,
                       'bg-green-100 text-green-800': lieu.est_valide
                     }">
                       {{ lieu.est_valide ? 'Validé' : 'En attente' }}
                     </span>
                   </td>
-                  <td class="px-4 py-2 text-gray-800">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <div class="flex space-x-2">
                     <button 
                       @click="toggleValidation(lieu)" 
                       :class="{
-                        'px-3 py-1 rounded mr-2': true,
+                            'px-3 py-1 text-xs font-medium rounded-md transition-colors duration-200': true,
                         'bg-green-600 text-white hover:bg-green-700': !lieu.est_valide,
                         'bg-yellow-600 text-white hover:bg-yellow-700': lieu.est_valide
                       }"
                     >
                       {{ lieu.est_valide ? 'Dévalider' : 'Valider' }}
                     </button>
-                    <button @click="editLieu(lieu)" class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700">Modifier</button>
+                        <button 
+                          @click="editLieu(lieu)" 
+                          class="px-3 py-1 text-xs font-medium bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+                        >
+                          Modifier
+                        </button>
+                      </div>
                   </td>
                 </tr>
               </tbody>
             </table>
+            </div>
 
             <!-- Modal d'édition de lieu -->
             <LieuModal
@@ -243,7 +273,7 @@ onMounted(async () => {
     .select('*', { count: 'exact', head: true })
   userCount.value = userCountData
 
-  // Compter les lieux
+  // Compter les lieux (incluant les restaurants)
   const { count: lieuxCountData } = await supabase
     .from('lieux')
     .select('*', { count: 'exact', head: true })
@@ -324,10 +354,39 @@ const toggleValidation = async (lieu) => {
 
 async function fetchLieux() {
   lieuxLoading.value = true
+  try {
+    // Récupérer tous les lieux avec les données des restaurants
   const { data, error } = await supabase
     .from('lieux')
-    .select('id, nom, ville, type, description, est_valide')
-  lieux.value = data || []
+      .select(`
+        id, 
+        nom, 
+        ville, 
+        type, 
+        est_valide,
+        restaurants (
+          id,
+          type_cuisine,
+          services,
+          prix_moyen
+        )
+      `)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    
+    // Traiter les données pour l'affichage
+    lieux.value = data.map(lieu => ({
+      ...lieu,
+      // Ajouter un indicateur pour les restaurants
+      isRestaurant: lieu.type === 'restaurant',
+      // Informations supplémentaires pour les restaurants
+      restaurantInfo: lieu.restaurants?.[0] || null
+    })) || []
+  } catch (error) {
+    console.error('Erreur lors du chargement des lieux:', error)
+    lieux.value = []
+  }
   lieuxLoading.value = false
 }
 

@@ -111,6 +111,11 @@ const router = createRouter({
       component: () => import('@/views/ContactView.vue')
     },
     {
+      path: '/devenir-contributeur',
+      name: 'become-contributor',
+      component: () => import('@/views/BecomeContributorView.vue')
+    },
+    {
       path: '/legal/terms',
       name: 'terms',
       component: () => import('@/views/TermsView.vue')

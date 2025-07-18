@@ -210,10 +210,10 @@
           Nous cherchons toujours des talents pour nous accompagner dans cette aventure.
         </p>
         <router-link 
-          to="/carriere" 
+          to="/career" 
           class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-gray-50 transition-colors"
         >
-          Voir nos offres
+          Rejoignez-nous
           <svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>

@@ -122,4 +122,97 @@ export const deleteArticle = async (id) => {
     .eq('id', id)
 
   return { error }
+}
+
+// =====================================================
+// FONCTIONS POUR LES AVIS
+// =====================================================
+
+// Récupérer les avis d'un lieu
+export const getAvis = async (lieuId) => {
+  const { data, error } = await supabase
+    .from('avis')
+    .select(`
+      *,
+      user_profiles:user_id (
+        nom,
+        prenom
+      )
+    `)
+    .eq('lieu_id', lieuId)
+    .order('created_at', { ascending: false })
+
+  return { data: data || [], error }
+}
+
+// Ajouter un avis sur un lieu
+export const addAvis = async (lieuId, note, commentaire) => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('Utilisateur non connecté')
+  }
+
+  const { data, error } = await supabase
+    .from('avis')
+    .insert([{
+      lieu_id: lieuId,
+      user_id: user.id,
+      note,
+      commentaire
+    }])
+    .select()
+    .single()
+
+  return { data, error }
+}
+
+// Modifier un avis
+export const updateAvis = async (avisId, note, commentaire) => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('Utilisateur non connecté')
+  }
+
+  const { data, error } = await supabase
+    .from('avis')
+    .update({ note, commentaire })
+    .eq('id', avisId)
+    .eq('user_id', user.id) // Sécurité : seul l'utilisateur peut modifier son avis
+    .select()
+    .single()
+
+  return { data, error }
+}
+
+// Supprimer un avis
+export const deleteAvis = async (avisId) => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    throw new Error('Utilisateur non connecté')
+  }
+
+  const { error } = await supabase
+    .from('avis')
+    .delete()
+    .eq('id', avisId)
+    .eq('user_id', user.id) // Sécurité : seul l'utilisateur peut supprimer son avis
+
+  return { error }
+}
+
+// Vérifier si l'utilisateur a déjà laissé un avis sur ce lieu
+export const checkUserAvis = async (lieuId) => {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return { hasAvis: false, avis: null }
+  }
+
+  const { data, error } = await supabase
+    .from('avis')
+    .select('*')
+    .eq('lieu_id', lieuId)
+    .eq('user_id', user.id)
+    .single()
+
+  return { hasAvis: !!data, avis: data }
 } 

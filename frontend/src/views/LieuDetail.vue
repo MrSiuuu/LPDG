@@ -2,7 +2,11 @@
   <div class="pt-6 sm:pt-10 mt-20 sm:mt-28 max-w-6xl mx-auto px-3 sm:px-4 bg-white dark:bg-gray-900">
     <!-- Galerie d'images dynamique -->
     <div class="flex flex-col md:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
-      <LieuGallery :images="galleryImages" />
+      <LieuGallery 
+        :images="galleryImages" 
+        :isLoggedIn="isLoggedIn"
+        @showLoginModal="showLoginModal = true"
+      />
     </div>
 
     <!-- Titre, note, localisation, actions, likes, badge visité -->
@@ -15,7 +19,13 @@
           <span v-if="lieu.ville" class="mx-1 sm:mx-2">•</span>
           <span v-if="lieu.ville" class="text-gray-700 dark:text-gray-200">{{ lieu.ville }}</span>
           <span v-if="lieu.type" class="mx-1 sm:mx-2">•</span>
-          <span v-if="lieu.type" class="bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-200 px-2 py-1 rounded text-xs">{{ lieu.type }}</span>
+          <span v-if="lieu.type" :class="{
+            'px-2 py-1 rounded text-xs': true,
+            'bg-red-100 dark:bg-red-800 text-red-700 dark:text-red-200': lieu.type === 'restaurant',
+            'bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-200': lieu.type !== 'restaurant'
+          }">
+            {{ lieu.type === 'restaurant' ? '🍽️ Restaurant' : lieu.type }}
+          </span>
           <span v-if="lieu.accessible_mobilite_reduite" class="mx-1 sm:mx-2">•</span>
           <span v-if="lieu.accessible_mobilite_reduite" class="bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200 px-2 py-1 rounded text-xs">Accessible PMR</span>
         </div>
@@ -61,11 +71,13 @@
             <span v-if="lieu.adresse" class="flex items-center gap-1"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500" fill="currentColor" viewBox="0 0 20 20"><rect width="12" height="8" x="4" y="8" rx="2"/></svg>Adresse : {{ lieu.adresse }}</span>
             <span v-if="lieu.accessible_mobilite_reduite" class="flex items-center gap-1"><svg class="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><circle cx="10" cy="10" r="10"/></svg>Accessibilité PMR</span>
           </div>
-          <div class="mb-3 text-gray-800 dark:text-gray-100 text-sm sm:text-base" v-html="descriptionHtml"></div>
+          <div class="mb-3 text-gray-800 dark:text-gray-100 text-sm sm:text-base" v-html="displayedDescriptionHtml"></div>
           <ul v-if="equipements && equipements.length" class="list-disc pl-5 mb-3 text-gray-700 dark:text-gray-200 text-sm">
             <li v-for="(eq, i) in equipements" :key="i">{{ eq }}</li>
           </ul>
-          <button v-if="isDescriptionTruncated" class="text-indigo-600 dark:text-indigo-300 underline text-sm mb-2">Afficher plus</button>
+          <button v-if="isDescriptionTruncated" @click="toggleDescription" class="text-indigo-600 dark:text-indigo-300 underline text-sm mb-2">
+            {{ showFullDescription ? 'Afficher moins' : 'Afficher plus' }}
+          </button>
           <!-- Ressources -->
           <div v-if="ressources && Array.isArray(ressources) && ressources.length > 0" class="mt-4">
             <h3 class="font-semibold text-gray-900 dark:text-white mb-2 text-sm sm:text-base">Ressources</h3>
@@ -97,6 +109,69 @@
           </ul>
           <div v-else class="text-gray-400 dark:text-gray-500">Aucun événement à venir.</div>
         </div>
+
+        <!-- Section Restaurant (affichée seulement si c'est un restaurant) -->
+        <div v-if="lieu.type === 'restaurant' && restaurantInfo" class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mb-4">
+          <h2 class="text-lg font-bold mb-4 text-orange-700 dark:text-orange-300 flex items-center">
+            🍽️ Informations Restaurant
+          </h2>
+          
+          <!-- Type de cuisine -->
+          <div v-if="restaurantInfo.type_cuisine" class="mb-3">
+            <div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 mb-1">
+              <svg class="w-4 h-4 text-orange-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="font-semibold">Type de cuisine :</span>
+            </div>
+            <span class="text-sm text-gray-900 dark:text-white">{{ restaurantInfo.type_cuisine }}</span>
+          </div>
+
+          <!-- Services proposés -->
+          <div v-if="restaurantInfo.services && restaurantInfo.services.length > 0" class="mb-3">
+            <div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 mb-2">
+              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="font-semibold">Services proposés :</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <span v-for="service in restaurantInfo.services" :key="service" 
+                    class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200">
+                {{ getServiceIcon(service) }} {{ service }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Réseaux sociaux du restaurant -->
+          <div v-if="restaurantInfo.site_web || restaurantInfo.whatsapp || restaurantInfo.facebook || restaurantInfo.instagram" class="mb-3">
+            <div class="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200 mb-2">
+              <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+              </svg>
+              <span class="font-semibold">Contact & Réseaux :</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a v-if="restaurantInfo.site_web" :href="restaurantInfo.site_web" target="_blank" 
+                 class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-700">
+                🌐 Site web
+              </a>
+              <a v-if="restaurantInfo.whatsapp" :href="`https://wa.me/${restaurantInfo.whatsapp}`" target="_blank"
+                 class="inline-flex items-center px-2 py-1 rounded text-xs bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200 hover:bg-green-200 dark:hover:bg-green-700">
+                📱 WhatsApp
+              </a>
+              <a v-if="restaurantInfo.facebook" :href="restaurantInfo.facebook" target="_blank"
+                 class="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-700">
+                📘 Facebook
+              </a>
+              <a v-if="restaurantInfo.instagram" :href="restaurantInfo.instagram" target="_blank"
+                 class="inline-flex items-center px-2 py-1 rounded text-xs bg-pink-100 dark:bg-pink-800 text-pink-700 dark:text-pink-200 hover:bg-pink-200 dark:hover:bg-pink-700">
+                📷 Instagram
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
       <!-- Colonne droite : Carte info rapide améliorée -->
       <div class="w-full lg:w-80 flex-shrink-0 order-2 mb-6 lg:mb-0">
@@ -109,7 +184,27 @@
           <!-- Type de lieu -->
           <div v-if="lieu.type" class="flex items-center gap-2 text-sm text-indigo-700 dark:text-indigo-300 font-semibold">
             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2" /></svg>
-            <span class="text-xs sm:text-sm">{{ lieu.type }}</span>
+            <span class="text-xs sm:text-sm">{{ lieu.type === 'restaurant' ? '🍽️ Restaurant' : lieu.type }}</span>
+          </div>
+
+          <!-- Informations restaurant (si c'est un restaurant) -->
+          <div v-if="lieu.type === 'restaurant' && restaurantInfo" class="space-y-2">
+            <!-- Type de cuisine -->
+            <div v-if="restaurantInfo.type_cuisine" class="flex items-center gap-2 text-sm text-orange-700 dark:text-orange-300 font-medium">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="text-xs sm:text-sm">{{ restaurantInfo.type_cuisine }}</span>
+            </div>
+            
+            <!-- Services -->
+            <div v-if="restaurantInfo.services && restaurantInfo.services.length > 0" class="flex flex-wrap gap-1">
+              <span v-for="service in restaurantInfo.services.slice(0, 3)" :key="service" 
+                    class="inline-flex items-center px-1 py-0.5 rounded text-xs bg-green-100 dark:bg-green-800 text-green-700 dark:text-green-200">
+                {{ getServiceIcon(service) }}
+              </span>
+              <span v-if="restaurantInfo.services.length > 3" class="text-xs text-gray-500">+{{ restaurantInfo.services.length - 3 }}</span>
+            </div>
           </div>
           <!-- Accessibilité PMR -->
           <div v-if="lieu.accessible_mobilite_reduite" class="flex items-center gap-2 text-sm text-green-700 dark:text-green-400 font-medium">
@@ -168,9 +263,18 @@
 
     <!-- Avis -->
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
-      <div class="flex items-center gap-2 mb-4">
-        <span class="text-yellow-500 font-bold text-base sm:text-lg">{{ noteMoyenne ? noteMoyenne.toFixed(1) : '-' }}</span>
-        <span class="text-gray-400 dark:text-gray-400 text-sm sm:text-base">({{ nombreAvis }} avis)</span>
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-yellow-500 font-bold text-base sm:text-lg">{{ noteMoyenne ? noteMoyenne.toFixed(1) : '-' }}</span>
+          <span class="text-gray-400 dark:text-gray-400 text-sm sm:text-base">({{ nombreAvis }} avis)</span>
+        </div>
+        <button 
+          v-if="isLoggedIn"
+          @click="showAddAvisModal = true"
+          class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
+        >
+          {{ userAvis ? 'Modifier mon avis' : '+ Ajouter un avis' }}
+        </button>
       </div>
       <div v-if="avis && avis.length" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4">
         <div v-for="a in avis" :key="a.id">
@@ -194,19 +298,75 @@
       :lieu="lieu"
       @close="showShareModal = false" 
     />
+
+    <!-- Modal d'ajout d'avis -->
+    <AddAvisModal
+      :isOpen="showAddAvisModal"
+      :lieuId="route.params.id"
+      :existingAvis="userAvis"
+      @close="showAddAvisModal = false"
+      @avis-added="handleAvisAdded"
+      @avis-updated="handleAvisUpdated"
+    />
+
+    <!-- Modal d'invitation à la connexion -->
+    <div v-if="showLoginModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+        <div class="text-center">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900 mb-4">
+            <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Connexion requise</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-300 mb-6">
+            Connectez-vous pour interagir avec les lieux (likes, visites)
+          </p>
+          <div class="flex gap-3 justify-center">
+            <button 
+              @click="goToLogin" 
+              class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
+            >
+              Se connecter
+            </button>
+            <button 
+              @click="goToRegister" 
+              class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
+              S'inscrire
+            </button>
+            <button 
+              @click="showLoginModal = false" 
+              class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-100 px-4 py-2 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import { supabase } from '@/supabase'
-import LieuGallery from '@/components/LieuGallery.vue'
-import ShareModal from '@/components/ShareModal.vue'
+import { useRoute, useRouter } from 'vue-router'
+import { supabase } from '../supabase'
+import LieuGallery from '../components/LieuGallery.vue'
+import ShareModal from '../components/ShareModal.vue'
+import SignalementModal from '../components/SignalementModal.vue'
+import LieuContacts from '../components/LieuContacts.vue'
+import LieuEvenements from '../components/LieuEvenements.vue'
+import LieuRessources from '../components/LieuRessources.vue'
+import LieuVideo from '../components/LieuVideo.vue'
+import LieuPartage from '../components/LieuPartage.vue'
+import LieuLikes from '../components/LieuLikes.vue'
+import AddAvisModal from '../components/AddAvisModal.vue'
 import Quill from 'quill'
 
 // Variables réactives
 const lieu = ref({})
+const loading = ref(true)
 const galleryImages = ref([])
 const likes = ref(0)
 const isVisited = ref(false)
@@ -218,12 +378,19 @@ const ressources = ref([])
 const reseauxSociaux = ref({})
 const equipements = ref([])
 const isDescriptionTruncated = ref(false)
+const showFullDescription = ref(false)
 const isLiked = ref(false)
 const showShareModal = ref(false)
 const contactPrincipal = ref(null)
+const restaurantInfo = ref(null) // Nouvelle variable pour les infos restaurant
+const showLoginModal = ref(false) // Nouvelle variable pour la modale de connexion
+const isLoggedIn = ref(false) // Variable pour vérifier si l'utilisateur est connecté
+const showAddAvisModal = ref(false) // Variable pour la modale d'ajout d'avis
+const userAvis = ref(null) // Variable pour stocker l'avis de l'utilisateur connecté
 
 // Route pour récupérer l'ID du lieu
 const route = useRoute()
+const router = useRouter() // Nouvelle instance de router
 
 // Fonction pour charger le lieu et ses données
 const chargerLieu = async () => {
@@ -239,6 +406,19 @@ const chargerLieu = async () => {
     
     if (lieuError) throw lieuError
     lieu.value = lieuData
+
+    // Charger les données du restaurant si c'est un restaurant
+    if (lieuData.type === 'restaurant') {
+      const { data: restaurantData, error: restaurantError } = await supabase
+        .from('restaurants')
+        .select('*')
+        .eq('lieu_id', lieuId)
+        .single()
+      
+      if (!restaurantError && restaurantData) {
+        restaurantInfo.value = restaurantData
+      }
+    }
 
     // Charger les images du lieu
     const { data: imagesData, error: imagesError } = await supabase
@@ -353,12 +533,54 @@ const chargerLieu = async () => {
     }
 
     // Vérifier si la description doit être tronquée
-    if (lieuData.description && lieuData.description.length > 200) {
+    if (lieuData.description) {
+      const descriptionText = extractTextFromDescription(lieuData.description)
+      if (descriptionText.length > 200) {
       isDescriptionTruncated.value = true
+      }
     }
 
   } catch (error) {
     console.error('Erreur lors du chargement du lieu:', error)
+  }
+}
+
+// Fonction pour charger les avis et calculer la note moyenne
+const chargerAvis = async () => {
+  try {
+    const lieuId = route.params.id
+    
+    // Charger les avis
+    const { data: avisData, error: avisError } = await supabase
+      .from('avis')
+      .select(`
+        *,
+        user_profiles:user_id (
+          nom,
+          prenom
+        )
+      `)
+      .eq('lieu_id', lieuId)
+      .order('created_at', { ascending: false })
+    
+    if (!avisError && avisData) {
+      avis.value = avisData.map(avis => ({
+        ...avis,
+        user_nom: `${avis.user_profiles?.prenom || ''} ${avis.user_profiles?.nom || ''}`.trim(),
+        initiales: `${avis.user_profiles?.prenom?.[0] || ''}${avis.user_profiles?.nom?.[0] || ''}`.toUpperCase()
+      }))
+      nombreAvis.value = avisData.length
+      
+      // Calculer la note moyenne
+      if (avisData.length > 0) {
+        const totalNotes = avisData.reduce((sum, avis) => sum + (avis.note || 0), 0)
+        noteMoyenne.value = totalNotes / avisData.length
+      } else {
+        noteMoyenne.value = 0
+      }
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement des avis:', error)
   }
 }
 
@@ -401,12 +623,44 @@ const reseauClass = (plateforme) => {
   return classes[plateforme] || 'text-gray-600 hover:underline flex items-center'
 }
 
+// Fonction pour extraire le texte brut d'une description (HTML ou Delta)
+const extractTextFromDescription = (desc) => {
+  if (!desc) return ''
+  try {
+    // Si c'est du JSON (Delta Quill)
+    const delta = JSON.parse(desc)
+    if (delta && delta.ops) {
+      return delta.ops.map(op => typeof op.insert === 'string' ? op.insert : '').join('')
+    }
+  } catch (e) {
+    // Sinon, c'est peut-être du HTML
+    const div = document.createElement('div')
+    div.innerHTML = desc
+    return div.textContent || div.innerText || ''
+  }
+  return desc
+}
+
+// Fonction pour obtenir l'icône des services
+const getServiceIcon = (service) => {
+  const icons = {
+    'sur place': '🍽️',
+    'à emporter': '📦',
+    'livraison': '🚚',
+    'terrasse': '🌳',
+    'wifi': '📶',
+    'parking': '🚗',
+    'réservation': '📞'
+  }
+  return icons[service] || '✅'
+}
+
 // Fonction pour basculer le like
 const toggleLike = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      console.error('Utilisateur non connecté')
+      showLoginModal.value = true
       return
     }
 
@@ -450,7 +704,7 @@ const toggleVisite = async () => {
   try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-      console.error('Utilisateur non connecté')
+      showLoginModal.value = true
       return
     }
 
@@ -487,10 +741,89 @@ const toggleVisite = async () => {
   }
 }
 
+// Fonction pour basculer l'affichage de la description
+const toggleDescription = () => {
+  showFullDescription.value = !showFullDescription.value
+}
+
+// Fonction pour rediriger vers la page de connexion
+const goToLogin = () => {
+  router.push('/login')
+  showLoginModal.value = false
+}
+
+// Fonction pour rediriger vers la page d'inscription
+const goToRegister = () => {
+  router.push('/register')
+  showLoginModal.value = false
+}
+
+// Fonction pour vérifier le statut de connexion
+const checkLoginStatus = async () => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    isLoggedIn.value = !!user
+  } catch (error) {
+    console.error('Erreur lors de la vérification du statut de connexion:', error)
+    isLoggedIn.value = false
+  }
+}
+
+// Fonction pour charger l'avis de l'utilisateur connecté
+const loadUserAvis = async () => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      userAvis.value = null
+      return
+    }
+
+    const { data, error } = await supabase
+      .from('avis')
+      .select('*')
+      .eq('lieu_id', route.params.id)
+      .eq('user_id', user.id)
+      .single()
+
+    if (!error && data) {
+      userAvis.value = data
+    } else {
+      userAvis.value = null
+    }
+  } catch (error) {
+    console.error('Erreur lors du chargement de l\'avis utilisateur:', error)
+    userAvis.value = null
+  }
+}
+
+// Fonction pour gérer l'ajout d'un avis
+const handleAvisAdded = async (newAvis) => {
+  try {
+    // Recharger les avis et la note moyenne
+    await chargerAvis()
+    await loadUserAvis()
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour après ajout d\'avis:', error)
+  }
+}
+
+// Fonction pour gérer la modification d'un avis
+const handleAvisUpdated = async (updatedAvis) => {
+  try {
+    // Recharger les avis et la note moyenne
+    await chargerAvis()
+    await loadUserAvis()
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour après modification d\'avis:', error)
+  }
+}
+
 // Charger les données au montage du composant
 onMounted(() => {
+  checkLoginStatus()
   chargerLieu()
   chargerContactPrincipal()
+  loadUserAvis()
 })
 
 const descriptionHtml = computed(() => {
@@ -518,6 +851,41 @@ const descriptionHtml = computed(() => {
     }
   })
   return div.innerHTML
+})
+
+// Description affichée (tronquée ou complète)
+const displayedDescriptionHtml = computed(() => {
+  if (!lieu.value.description) return ''
+  
+  let html = descriptionHtml.value
+  
+  // Si la description doit être tronquée et qu'on n'affiche pas tout
+  if (isDescriptionTruncated.value && !showFullDescription.value) {
+    const textContent = extractTextFromDescription(lieu.value.description)
+    if (textContent.length > 200) {
+      // Créer une version tronquée
+      const truncatedText = textContent.substring(0, 200) + '...'
+      
+      // Essayer de créer du HTML tronqué proprement
+      try {
+        const delta = JSON.parse(lieu.value.description)
+        if (delta && delta.ops) {
+          // Pour les Delta Quill, on tronque le texte brut
+          return `<p>${truncatedText}</p>`
+        }
+      } catch (e) {
+        // Pour le HTML, on tronque le texte
+        const div = document.createElement('div')
+        div.innerHTML = html
+        const text = div.textContent || div.innerText || ''
+        if (text.length > 200) {
+          return `<p>${text.substring(0, 200)}...</p>`
+        }
+      }
+    }
+  }
+  
+  return html
 })
 
 // Forcer target="_blank" sur tous les liens de la description après rendu

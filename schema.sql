@@ -200,3 +200,49 @@ CREATE TABLE contacts_lieu (
 CREATE INDEX idx_videos_lieu_lieu_id ON videos_lieu(lieu_id);
 CREATE INDEX idx_evenements_lieu_lieu_id ON evenements_lieu(lieu_id);
 CREATE INDEX idx_contacts_lieu_lieu_id ON contacts_lieu(lieu_id);
+
+-- ===========================================
+-- TABLES POUR LA GESTION DES RESTAURANTS
+-- ===========================================
+
+-- Table des restaurants (spécialisation de lieux)
+CREATE TABLE restaurants (
+    id SERIAL PRIMARY KEY,
+    lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
+    prix_moyen NUMERIC,
+    type_cuisine TEXT, -- ex: 'guinéenne', 'fast-food', etc.
+    services TEXT[],   -- ex: ['sur place', 'à emporter', 'livraison']
+    reservation_possible BOOLEAN DEFAULT FALSE,
+    site_web TEXT,
+    facebook TEXT,
+    instagram TEXT,
+    whatsapp TEXT
+);
+
+-- Table des menus (liés à un restaurant)
+CREATE TABLE menus (
+    id SERIAL PRIMARY KEY,
+    restaurant_id INT REFERENCES restaurants(id) ON DELETE CASCADE,
+    nom TEXT NOT NULL,
+    prix NUMERIC, -- optionnel
+    description TEXT
+);
+
+-- Table des plats (liés à un menu OU à la carte)
+CREATE TABLE plats (
+    id SERIAL PRIMARY KEY,
+    menu_id INT REFERENCES menus(id) ON DELETE CASCADE,
+    restaurant_id INT REFERENCES restaurants(id) ON DELETE CASCADE,
+    nom TEXT NOT NULL,
+    prix NUMERIC NOT NULL,
+    description TEXT,
+    photo TEXT,
+    categorie TEXT, -- entrée, plat, dessert, boisson, etc.
+    options JSONB DEFAULT '[]' -- ex: [{ "nom": "Sauce", "choix": ["piquante", "arachide"] }]
+);
+
+-- Index pour optimiser les requêtes
+CREATE INDEX idx_restaurants_lieu_id ON restaurants(lieu_id);
+CREATE INDEX idx_menus_restaurant_id ON menus(restaurant_id);
+CREATE INDEX idx_plats_menu_id ON plats(menu_id);
+CREATE INDEX idx_plats_restaurant_id ON plats(restaurant_id);
