@@ -1,5 +1,5 @@
 <template>
-  <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 fixed w-full z-20 top-0 left-0">
+  <nav class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-white/20 dark:border-gray-700/50 fixed w-full z-20 top-0 left-0">
     <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
       <!-- Titre à gauche -->
       <router-link to="/" class="flex items-center space-x-2">
@@ -57,7 +57,7 @@
     
     <!-- Menu mobile -->
     <div v-if="showMenu" class="md:hidden">
-      <div class="px-2 pt-2 pb-3 space-y-1 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
+      <div class="px-2 pt-2 pb-3 space-y-1 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-white/20 dark:border-gray-700/50">
         <!-- Toggle dark mode mobile -->
         <div class="flex justify-center mb-3">
           <button
@@ -210,7 +210,13 @@ onMounted(() => {
   })
 
   const saved = localStorage.getItem('theme')
-  applyTheme(saved === 'dark')
+  // Mode sombre par défaut, sauf si l'utilisateur a explicitement choisi le mode clair
+  if (saved === 'light') {
+    applyTheme(false)
+  } else {
+    // Par défaut, mode sombre
+    applyTheme(true)
+  }
   updateHamburgerColor()
   const observer = new MutationObserver(updateHamburgerColor)
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })

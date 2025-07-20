@@ -16,8 +16,7 @@
             </div>
           </div>
           <p class="text-gray-600 dark:text-gray-200 text-sm leading-relaxed">
-            Découvrez, partagez et explorez les merveilleux lieux touristiques de la Guinée. 
-            Une plateforme collaborative pour tous les amoureux du voyage.
+            La <span class="text-indigo-600 dark:text-indigo-400 font-semibold">Guinée</span> comme vous ne l'avez jamais vue. Une plateforme collaborative pour tous les amoureux du voyage.
           </p>
           <div class="flex space-x-4 mt-4">
             <!-- Facebook -->

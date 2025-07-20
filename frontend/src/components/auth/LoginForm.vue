@@ -125,11 +125,19 @@
                 <p class="text-white/90 drop-shadow-md mb-6">
                   Explorez les merveilles de notre pays
                 </p>
-                <!-- Placeholder pour la carte interactive -->
-                <div class="w-full h-64 bg-white/5 rounded-lg border border-white/20 flex items-center justify-center">
-                  <p class="text-white/70 text-sm">
-                    Carte interactive de la Guinée
-                  </p>
+                <!-- Carte de la Guinée en verre avec animation 3D automatique -->
+                <div class="w-full h-64 rounded-lg overflow-hidden shadow-2xl perspective-1000">
+                  <div class="relative w-full h-full transform-style-preserve-3d animate-float-3d">
+                    <img 
+                      src="https://pycevqvvryollfkyizla.supabase.co/storage/v1/object/public/images/backgroundlogin/guinell%20galss.png" 
+                      alt="Carte de la Guinée en verre" 
+                      class="w-full h-full object-contain animate-brightness-pulse"
+                    />
+                    <!-- Effet de brillance 3D -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent animate-brilliance"></div>
+                    <!-- Ombre portée 3D -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-black/20 via-transparent to-transparent animate-shadow-3d transform translate-z-4"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -249,4 +257,107 @@ const handleLogin = async () => {
     router.push('/dashboard-user')
   }
 }
-</script> 
+</script>
+
+<style scoped>
+/* Animations 3D personnalisées */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.transform-style-preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.rotate-y-12 {
+  transform: rotateY(12deg);
+}
+
+.rotate-x-6 {
+  transform: rotateX(6deg);
+}
+
+.translate-z-4 {
+  transform: translateZ(4px);
+}
+
+/* Animation de flottement automatique */
+.animate-float-3d {
+  animation: float3d 4s ease-in-out infinite;
+}
+
+@keyframes float3d {
+  0%, 100% {
+    transform: translateY(0px) rotateY(8deg) rotateX(4deg) scale(1.02);
+  }
+  25% {
+    transform: translateY(-8px) rotateY(12deg) rotateX(6deg) scale(1.05);
+  }
+  50% {
+    transform: translateY(-5px) rotateY(6deg) rotateX(3deg) scale(1.03);
+  }
+  75% {
+    transform: translateY(-12px) rotateY(10deg) rotateX(5deg) scale(1.04);
+  }
+}
+
+/* Animation de brillance automatique */
+.animate-brilliance {
+  animation: brilliance 3s ease-in-out infinite;
+}
+
+@keyframes brilliance {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Animation d'ombre 3D automatique */
+.animate-shadow-3d {
+  animation: shadow3d 4s ease-in-out infinite;
+}
+
+@keyframes shadow3d {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translateZ(2px);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateZ(6px);
+  }
+}
+
+/* Animation de pulsation de luminosité */
+.animate-brightness-pulse {
+  animation: brightnessPulse 5s ease-in-out infinite;
+}
+
+@keyframes brightnessPulse {
+  0%, 100% {
+    filter: brightness(1) contrast(1);
+  }
+  50% {
+    filter: brightness(1.1) contrast(1.1);
+  }
+}
+
+/* Animation d'entrée */
+.transform-style-preserve-3d {
+  animation: slideIn 1s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px) rotateY(-20deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateY(0deg);
+  }
+}
+</style> 

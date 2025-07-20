@@ -12,6 +12,12 @@ import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
+// Appliquer le mode sombre par défaut au chargement de l'app
+const savedTheme = localStorage.getItem('theme')
+if (savedTheme !== 'light') {
+  document.documentElement.classList.add('dark')
+}
+
 const app = createApp(App)
 
 app.use(createPinia())
