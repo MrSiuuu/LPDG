@@ -265,8 +265,8 @@
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
-          <span class="text-yellow-500 font-bold text-base sm:text-lg">{{ noteMoyenne ? noteMoyenne.toFixed(1) : '-' }}</span>
-          <span class="text-gray-400 dark:text-gray-400 text-sm sm:text-base">({{ nombreAvis }} avis)</span>
+        <span class="text-yellow-500 font-bold text-base sm:text-lg">{{ noteMoyenne ? noteMoyenne.toFixed(1) : '-' }}</span>
+        <span class="text-gray-400 dark:text-gray-400 text-sm sm:text-base">({{ nombreAvis }} avis)</span>
         </div>
         <button 
           v-if="isLoggedIn"

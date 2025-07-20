@@ -10,12 +10,13 @@
           v-for="item in navItems"
           :key="item.tab"
           @click="setTab(item.tab)"
-          class="block w-full text-left px-4 py-3 rounded hover:bg-indigo-800"
+          class="flex items-center w-full text-left px-4 py-3 rounded hover:bg-indigo-800"
           :class="{
             'bg-indigo-800 font-semibold': activeTab === item.tab,
             'text-white': activeTab !== item.tab
           }"
         >
+          <component :is="item.icon" class="w-5 h-5 mr-3" />
           {{ item.label }}
         </button>
       </nav>
@@ -145,6 +146,12 @@ import axios from 'axios'
 import LieuForm from '../components/LieuForm.vue'
 import ProfileEdit from './ProfileEdit.vue'
 import RestaurantForm from '../components/RestaurantForm.vue'
+import { 
+  ChartBarIcon, 
+  MapPinIcon, 
+  PlusIcon, 
+  UserIcon 
+} from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const loading = ref(true)
@@ -154,10 +161,10 @@ const profile = ref({})
 
 // Navigation items
 const navItems = [
-  { tab: 'dashboard', label: 'Tableau de bord' },
-  { tab: 'lieux', label: 'Mes lieux' },
-  { tab: 'ajouter', label: 'Ajouter un lieu' },
-  { tab: 'profil', label: 'Mon profil' }
+  { tab: 'dashboard', label: 'Tableau de bord', icon: ChartBarIcon },
+  { tab: 'lieux', label: 'Mes lieux', icon: MapPinIcon },
+  { tab: 'ajouter', label: 'Ajouter un lieu', icon: PlusIcon },
+  { tab: 'profil', label: 'Mon profil', icon: UserIcon }
 ]
 
 // Statistiques

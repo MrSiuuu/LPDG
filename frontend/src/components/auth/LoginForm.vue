@@ -19,14 +19,14 @@
         <!-- Bloc gauche - Formulaire -->
         <div class="space-y-8">
           <!-- Logo et titre -->
-          <div class="text-center lg:text-left">
+      <div class="text-center lg:text-left">
             <h2 class="text-3xl font-bold text-white drop-shadow-lg">
               Connexion
             </h2>
             <p class="mt-2 text-sm text-gray-200 drop-shadow-md">
               Connectez-vous pour accéder à votre espace personnel
-            </p>
-          </div>
+        </p>
+      </div>
 
           <!-- Formulaire avec effet de verre -->
           <div class="bg-transparent backdrop-blur-sm rounded-2xl shadow-2xl p-8 border border-white/10 relative overflow-hidden">
@@ -85,7 +85,7 @@
               <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
               <span class="relative z-10 drop-shadow-lg">Se connecter</span>
             </button>
-          </div>
+              </div>
 
           <!-- Message d'erreur -->
           <div v-if="confirmationMessage" class="mt-4 p-3 bg-red-500/20 border border-red-400/50 rounded-lg backdrop-blur-sm">
@@ -159,10 +159,8 @@ const confirmationMessage = ref('')
 
 // Images de la Guinée
 const images = [
-  { src: '/src/assets/Le nimba.jpg', name: 'Mont Nimba' },
-  { src: '/src/assets/Plage_de_Sôrô.jpg', name: 'Plage de Sôrô' },
-  { src: '/src/assets/hauteguine.jpg', name: 'Haute Guinée' },
-  { src: '/src/assets/masque-nimba-heaume (1).jpg', name: 'Masque Nimba' }
+  { src: 'https://pycevqvvryollfkyizla.supabase.co/storage/v1/object/public/images/backgroundlogin/masque-nimba-heaume%20(1).jpg', name: 'Masque Nimba' },
+  { src: 'https://pycevqvvryollfkyizla.supabase.co/storage/v1/object/public/images/backgroundlogin/mont-nimba-sable-mining.avif', name: 'Mont Nimba - Sable Mining' }
 ]
 
 const currentImageIndex = ref(0)

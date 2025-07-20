@@ -16,7 +16,7 @@
             'text-gray-300 dark:text-gray-400': activeTab !== item.tab
           }"
         >
-          <span class="mr-3 text-xl">{{ item.icon }}</span>
+          <component :is="item.icon" class="w-6 h-6 mr-3" />
           {{ item.label }}
         </button>
       </nav>
@@ -60,14 +60,20 @@
 
         <!-- Onglet Accueil du site -->
         <div v-show="activeTab === 'accueil'">
-          <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Retour à l'accueil</h2>
-          <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+          <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Activités récentes</h2>
+          
+          <!-- Composant d'activités récentes -->
+          <RecentActivities />
+          
+          <!-- Section retour à l'accueil -->
+          <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Retour à l'accueil</h3>
             <p class="text-gray-600 dark:text-gray-300 mb-4">Vous allez quitter votre espace personnel pour retourner à l'accueil du site.</p>
             <router-link 
               to="/" 
               class="inline-flex items-center px-6 py-3 bg-indigo-600 dark:bg-indigo-700 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-800 transition-colors duration-200 shadow-sm hover:shadow-md"
             >
-              <span class="mr-2">🏠</span>
+              <HomeIcon class="w-5 h-5 mr-2" />
               Aller à l'accueil du site
             </router-link>
           </div>
@@ -199,7 +205,7 @@
         class="flex flex-col items-center py-2 flex-1" 
         :class="activeTab === item.tab ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400 dark:text-gray-300'"
       >
-        <span class="text-xl mb-1">{{ item.icon }}</span>
+        <component :is="item.icon" class="w-6 h-6 mb-1" />
         <span class="text-xs">{{ item.label }}</span>
       </button>
     </nav>
@@ -213,6 +219,13 @@ import { supabase } from '../supabase'
 import axios from 'axios'
 import ProfileEdit from './ProfileEdit.vue'
 import UserAvatar from '../components/UserAvatar.vue'
+import RecentActivities from '../components/RecentActivities.vue'
+import { 
+  ChartBarIcon, 
+  HomeIcon, 
+  HeartIcon, 
+  UserIcon 
+} from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const profile = ref({})
@@ -224,10 +237,10 @@ const loadingVisitedLieux = ref(false)
 const successMessage = ref('')
 
 const navItems = [
-  { label: 'Dashboard', tab: 'dashboard', icon: '📊' },
-  { label: 'Accueil', tab: 'accueil', icon: '🏠' },
-  { label: 'Favoris', tab: 'favoris', icon: '❤️' },
-  { label: 'Profil', tab: 'profil', icon: '👤' }
+  { label: 'Dashboard', tab: 'dashboard', icon: ChartBarIcon },
+  { label: 'Accueil', tab: 'accueil', icon: HomeIcon },
+  { label: 'Favoris', tab: 'favoris', icon: HeartIcon },
+  { label: 'Profil', tab: 'profil', icon: UserIcon }
 ]
 
 function setTab(tab) {

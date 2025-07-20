@@ -1,5 +1,5 @@
 -- Table des rôles
-CREATE TABLE roles (
+CREATE TABLE IF NOT EXISTS roles (
     id SERIAL PRIMARY KEY,
     label TEXT NOT NULL UNIQUE,
     description TEXT,
@@ -11,10 +11,11 @@ INSERT INTO roles (label, description) VALUES
     ('user', 'Utilisateur simple'),
     ('contributor', 'Utilisateur contributeur'),
     ('blogger', 'Blogueur'),
-    ('admin', 'Administrateur');
+    ('admin', 'Administrateur')
+ON CONFLICT (label) DO NOTHING;
 
 -- Table des profils utilisateurs liés à Supabase Auth
-CREATE TABLE user_profiles (
+CREATE TABLE IF NOT EXISTS user_profiles (
     id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
     nom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
@@ -29,7 +30,7 @@ CREATE TABLE user_profiles (
 );
 
 -- Table des lieux touristiques
-CREATE TABLE lieux (
+CREATE TABLE IF NOT EXISTS lieux (
     id SERIAL PRIMARY KEY,
     nom TEXT NOT NULL,
     type TEXT NOT NULL,
@@ -51,7 +52,7 @@ CREATE TABLE lieux (
 );
 
 -- Table des photos ajoutées aux lieux
-CREATE TABLE photos_lieu (
+CREATE TABLE IF NOT EXISTS photos_lieu (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE SET NULL,
@@ -60,7 +61,7 @@ CREATE TABLE photos_lieu (
 );
 
 -- Table des avis sur les lieux
-CREATE TABLE avis (
+CREATE TABLE IF NOT EXISTS avis (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE SET NULL,
@@ -70,7 +71,7 @@ CREATE TABLE avis (
 );
 
 -- Table des signalements
-CREATE TABLE signalements (
+CREATE TABLE IF NOT EXISTS signalements (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE SET NULL,
@@ -79,7 +80,7 @@ CREATE TABLE signalements (
 );
 
 -- Table des articles (blogs)
-CREATE TABLE articles (
+CREATE TABLE IF NOT EXISTS articles (
     id SERIAL PRIMARY KEY,
     titre TEXT NOT NULL,
     contenu TEXT,
@@ -94,7 +95,7 @@ CREATE TABLE articles (
 );
 
 -- Table des commentaires sur les articles
-CREATE TABLE commentaires_article (
+CREATE TABLE IF NOT EXISTS commentaires_article (
     id SERIAL PRIMARY KEY,
     article_id INT REFERENCES articles(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE SET NULL,
@@ -103,7 +104,7 @@ CREATE TABLE commentaires_article (
 );
 
 -- Table des notifications
-CREATE TABLE notifications (
+CREATE TABLE IF NOT EXISTS notifications (
     id SERIAL PRIMARY KEY,
     user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
     type TEXT,
@@ -113,7 +114,7 @@ CREATE TABLE notifications (
 );
 
 -- Table des lieux visités par les utilisateurs
-CREATE TABLE lieux_visites (
+CREATE TABLE IF NOT EXISTS lieux_visites (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
@@ -122,7 +123,7 @@ CREATE TABLE lieux_visites (
 );
 
 -- Table des likes sur les lieux
-CREATE TABLE likes_lieu (
+CREATE TABLE IF NOT EXISTS likes_lieu (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
@@ -131,7 +132,7 @@ CREATE TABLE likes_lieu (
 );
 
 -- Table des likes sur les articles
-CREATE TABLE likes_article (
+CREATE TABLE IF NOT EXISTS likes_article (
     id SERIAL PRIMARY KEY,
     article_id INT REFERENCES articles(id) ON DELETE CASCADE,
     user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE,
@@ -144,7 +145,7 @@ CREATE TABLE likes_article (
 -- =====================================================
 
 -- Table des vidéos de présentation des lieux
-CREATE TABLE videos_lieu (
+CREATE TABLE IF NOT EXISTS videos_lieu (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     titre TEXT NOT NULL,
@@ -159,7 +160,7 @@ CREATE TABLE videos_lieu (
 );
 
 -- Table des événements associés aux lieux
-CREATE TABLE evenements_lieu (
+CREATE TABLE IF NOT EXISTS evenements_lieu (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     titre TEXT NOT NULL,
@@ -180,7 +181,7 @@ CREATE TABLE evenements_lieu (
 );
 
 -- Table des contacts référents des lieux
-CREATE TABLE contacts_lieu (
+CREATE TABLE IF NOT EXISTS contacts_lieu (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     nom_contact TEXT NOT NULL,
@@ -197,16 +198,16 @@ CREATE TABLE contacts_lieu (
 );
 
 -- Index pour optimiser les performances
-CREATE INDEX idx_videos_lieu_lieu_id ON videos_lieu(lieu_id);
-CREATE INDEX idx_evenements_lieu_lieu_id ON evenements_lieu(lieu_id);
-CREATE INDEX idx_contacts_lieu_lieu_id ON contacts_lieu(lieu_id);
+CREATE INDEX IF NOT EXISTS idx_videos_lieu_lieu_id ON videos_lieu(lieu_id);
+CREATE INDEX IF NOT EXISTS idx_evenements_lieu_lieu_id ON evenements_lieu(lieu_id);
+CREATE INDEX IF NOT EXISTS idx_contacts_lieu_lieu_id ON contacts_lieu(lieu_id);
 
 -- ===========================================
 -- TABLES POUR LA GESTION DES RESTAURANTS
 -- ===========================================
 
 -- Table des restaurants (spécialisation de lieux)
-CREATE TABLE restaurants (
+CREATE TABLE IF NOT EXISTS restaurants (
     id SERIAL PRIMARY KEY,
     lieu_id INT REFERENCES lieux(id) ON DELETE CASCADE,
     prix_moyen NUMERIC,
@@ -220,7 +221,7 @@ CREATE TABLE restaurants (
 );
 
 -- Table des menus (liés à un restaurant)
-CREATE TABLE menus (
+CREATE TABLE IF NOT EXISTS menus (
     id SERIAL PRIMARY KEY,
     restaurant_id INT REFERENCES restaurants(id) ON DELETE CASCADE,
     nom TEXT NOT NULL,
@@ -229,7 +230,7 @@ CREATE TABLE menus (
 );
 
 -- Table des plats (liés à un menu OU à la carte)
-CREATE TABLE plats (
+CREATE TABLE IF NOT EXISTS plats (
     id SERIAL PRIMARY KEY,
     menu_id INT REFERENCES menus(id) ON DELETE CASCADE,
     restaurant_id INT REFERENCES restaurants(id) ON DELETE CASCADE,
@@ -242,7 +243,7 @@ CREATE TABLE plats (
 );
 
 -- Index pour optimiser les requêtes
-CREATE INDEX idx_restaurants_lieu_id ON restaurants(lieu_id);
-CREATE INDEX idx_menus_restaurant_id ON menus(restaurant_id);
-CREATE INDEX idx_plats_menu_id ON plats(menu_id);
-CREATE INDEX idx_plats_restaurant_id ON plats(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_restaurants_lieu_id ON restaurants(lieu_id);
+CREATE INDEX IF NOT EXISTS idx_menus_restaurant_id ON menus(restaurant_id);
+CREATE INDEX IF NOT EXISTS idx_plats_menu_id ON plats(menu_id);
+CREATE INDEX IF NOT EXISTS idx_plats_restaurant_id ON plats(restaurant_id);

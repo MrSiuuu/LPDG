@@ -10,12 +10,13 @@
           v-for="item in navItems"
           :key="item.tab"
           @click="setTab(item.tab)"
-          class="block w-full text-left px-4 py-3 rounded hover:bg-purple-800"
+          class="flex items-center w-full text-left px-4 py-3 rounded hover:bg-purple-800"
           :class="{
             'bg-purple-800 font-semibold': activeTab === item.tab,
             'text-white': activeTab !== item.tab
           }"
         >
+          <component :is="item.icon" class="w-5 h-5 mr-3" />
           {{ item.label }}
         </button>
       </nav>
@@ -94,6 +95,11 @@ import { useRouter } from 'vue-router'
 import { supabase } from '../supabase'
 import ArticleList from '../components/ArticleList.vue'
 import ProfileEdit from './ProfileEdit.vue'
+import { 
+  ChartBarIcon, 
+  DocumentTextIcon, 
+  UserIcon 
+} from '@heroicons/vue/24/outline'
 
 const router = useRouter()
 const profile = ref({})
@@ -103,9 +109,9 @@ const activeTab = ref('dashboard')
 
 // Navigation items
 const navItems = [
-  { tab: 'dashboard', label: 'Tableau de bord' },
-  { tab: 'articles', label: 'Mes articles' },
-  { tab: 'profil', label: 'Mon profil' }
+  { tab: 'dashboard', label: 'Tableau de bord', icon: ChartBarIcon },
+  { tab: 'articles', label: 'Mes articles', icon: DocumentTextIcon },
+  { tab: 'profil', label: 'Mon profil', icon: UserIcon }
 ]
 
 // Statistiques

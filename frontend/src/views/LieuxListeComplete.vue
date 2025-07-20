@@ -365,7 +365,8 @@ const fetchLieux = async () => {
         *,
         user_profiles (nom),
         photos_lieu (url)
-      `);
+      `)
+      .eq('est_valide', true); // Filtrer seulement les lieux validés
 
     // Filtre par type
     if (filtres.value.type) {

@@ -191,6 +191,15 @@
       </div>
     </main>
   </div>
+
+  <!-- Notification Toast -->
+  <NotificationToast
+    :show="notification.show"
+    :type="notification.type"
+    :title="notification.title"
+    :message="notification.message"
+    @close="hideNotification"
+  />
 </template>
 
 <script setup>
@@ -198,6 +207,7 @@ import { useRouter } from 'vue-router'
 import { ref, onMounted } from 'vue'
 import { supabase } from '../supabase'
 import LieuModal from '@/components/LieuModal.vue'
+import NotificationToast from '@/components/NotificationToast.vue'
 import axios from 'axios'
 import ProfileEdit from './ProfileEdit.vue'
 
@@ -205,6 +215,27 @@ const router = useRouter()
 const profile = ref({})
 const showLieuModal = ref(false)
 const editingLieu = ref(null)
+
+// Notification toast
+const notification = ref({
+  show: false,
+  type: 'success',
+  title: '',
+  message: ''
+})
+
+const showNotification = (type, title, message) => {
+  notification.value = {
+    show: true,
+    type,
+    title,
+    message
+  }
+}
+
+const hideNotification = () => {
+  notification.value.show = false
+}
 
 // Navigation items
 const navItems = [
@@ -318,18 +349,43 @@ const updateLieu = async (lieuData) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Non authentifié')
 
+    // Vérifier que l'utilisateur est admin
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*, roles(label)')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      showNotification('error', 'Erreur', 'Profil utilisateur non trouvé')
+      return
+    }
+
+    if (profile.roles.label !== 'admin') {
+      showNotification('error', 'Accès refusé', 'Vous devez être administrateur pour modifier des lieux')
+      return
+    }
+
     const { error } = await supabase
       .from('lieux')
       .update(lieuData)
       .eq('id', lieuData.id)
 
-    if (error) throw error
+    if (error) {
+      console.error('Erreur Supabase:', error)
+      showNotification('error', 'Erreur', `Erreur lors de la modification : ${error.message}`)
+      return
+    }
+
+    // Notification de succès
+    showNotification('success', 'Succès', `Lieu "${lieuData.nom}" modifié avec succès !`)
 
     // Rafraîchir la liste des lieux
     await fetchLieux()
     closeLieuModal()
   } catch (error) {
     console.error('Erreur lors de la mise à jour du lieu:', error.message)
+    showNotification('error', 'Erreur', `Erreur lors de la modification : ${error.message}`)
   }
 }
 
@@ -338,26 +394,69 @@ const toggleValidation = async (lieu) => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Non authentifié')
 
+    // Vérifier que l'utilisateur est admin
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*, roles(label)')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      showNotification('error', 'Erreur', 'Profil utilisateur non trouvé')
+      return
+    }
+
+    if (profile.roles.label !== 'admin') {
+      showNotification('error', 'Accès refusé', 'Vous devez être administrateur pour valider des lieux')
+      return
+    }
+
     const { error } = await supabase
       .from('lieux')
       .update({ est_valide: !lieu.est_valide })
       .eq('id', lieu.id)
 
-    if (error) throw error
+    if (error) {
+      console.error('Erreur Supabase:', error)
+      showNotification('error', 'Erreur', `Erreur lors de la validation : ${error.message}`)
+      return
+    }
+
+    // Notification de succès
+    showNotification('success', 'Succès', `Lieu "${lieu.nom}" ${!lieu.est_valide ? 'validé' : 'dévalidé'} avec succès !`)
 
     // Rafraîchir la liste des lieux
     await fetchLieux()
   } catch (error) {
     console.error('Erreur lors de la validation du lieu:', error.message)
+    showNotification('error', 'Erreur', `Erreur lors de la validation : ${error.message}`)
   }
 }
 
 async function fetchLieux() {
   lieuxLoading.value = true
   try {
+    // Vérifier que l'utilisateur est admin
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Non authentifié')
+
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('*, roles(label)')
+      .eq('id', user.id)
+      .single()
+
+    if (profileError || !profile) {
+      throw new Error('Profil utilisateur non trouvé')
+    }
+
+    if (profile.roles.label !== 'admin') {
+      throw new Error('Accès non autorisé - Rôle admin requis')
+    }
+
     // Récupérer tous les lieux avec les données des restaurants
-  const { data, error } = await supabase
-    .from('lieux')
+    const { data, error } = await supabase
+      .from('lieux')
       .select(`
         id, 
         nom, 
@@ -373,7 +472,10 @@ async function fetchLieux() {
       `)
       .order('created_at', { ascending: false })
     
-    if (error) throw error
+    if (error) {
+      console.error('Erreur Supabase:', error)
+      throw new Error(`Erreur lors du chargement : ${error.message}`)
+    }
     
     // Traiter les données pour l'affichage
     lieux.value = data.map(lieu => ({
@@ -383,8 +485,11 @@ async function fetchLieux() {
       // Informations supplémentaires pour les restaurants
       restaurantInfo: lieu.restaurants?.[0] || null
     })) || []
+
+    console.log(`${lieux.value.length} lieux chargés avec succès`)
   } catch (error) {
     console.error('Erreur lors du chargement des lieux:', error)
+    showNotification('error', 'Erreur', `Erreur lors du chargement des lieux : ${error.message}`)
     lieux.value = []
   }
   lieuxLoading.value = false
